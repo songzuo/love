@@ -9,12 +9,14 @@ console.log('Environment:', process.env.NODE_ENV)
 console.log('Database Host:', process.env.DB_HOST)
 console.log('Database Name:', process.env.DB_NAME)
 console.log('Database User:', process.env.DB_USERNAME)
+console.log('Postgres User:', process.env.POSTGRES_USER)
+console.log('Database Password exists:', !!process.env.DB_PASSWORD)
 
 // 创建 Sequelize 实例
 const sequelize = new Sequelize(
   process.env.DB_NAME || process.env.POSTGRES_DB || 'dating-app',
-  process.env.DB_USERNAME || process.env.POSTGRES_USER || 'postgres',
-  process.env.DB_PASSWORD || process.env.POSTGRES_PASSWORD || 'songzone',
+  process.env.DB_USERNAME || process.env.POSTGRES_USER || 'love',
+  process.env.DB_PASSWORD || process.env.POSTGRES_PASSWORD || 'wkw659QxAYHl26SWQPnYcMtAFjBfIifP',
   {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || process.env.POSTGRES_PORT || '5432'),
