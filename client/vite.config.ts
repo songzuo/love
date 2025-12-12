@@ -5,6 +5,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/love/', // 设置GitHub Pages的base路径
+  build: {
+    outDir: 'dist',
+  },
   server: {
     port: 3000,
     proxy: {

@@ -50,6 +50,3 @@ GitPortable/
 # Simple server files
 simple-http-server.js
 simple-server.js
-
-# Index.html (if not needed)
-index.html
