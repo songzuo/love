@@ -4,6 +4,18 @@ import dotenv from 'dotenv'
 // Load environment variables
 dotenv.config()
 
+// Debug all relevant environment variables
+console.log('All env vars:', {
+  DB_USERNAME: process.env.DB_USERNAME,
+  POSTGRES_USER: process.env.POSTGRES_USER,
+  DB_PASSWORD: process.env.DB_PASSWORD ? '***SET***' : '***NOT SET***',
+  POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD ? '***SET***' : '***NOT SET***',
+  DB_NAME: process.env.DB_NAME,
+  POSTGRES_DB: process.env.POSTGRES_DB,
+  DB_HOST: process.env.DB_HOST,
+  DB_PORT: process.env.DB_PORT
+});
+
 // Log environment for debugging
 console.log('Environment:', process.env.NODE_ENV)
 console.log('Database Host:', process.env.DB_HOST)
@@ -19,7 +31,8 @@ const dbName = process.env.DB_NAME || process.env.POSTGRES_DB || 'love_tmwe';
 const dbHost = process.env.DB_HOST || 'dpg-d4u9oem3jp1c73dtqr9g-a';
 const dbPort = parseInt(process.env.DB_PORT || process.env.POSTGRES_PORT || '5432');
 
-console.log('Using database credentials - User:', dbUsername, 'DB:', dbName, 'Host:', dbHost, 'Port:', dbPort);
+console.log('Final database credentials - User:', dbUsername, 'DB:', dbName, 'Host:', dbHost, 'Port:', dbPort);
+console.log('Password length:', dbPassword.length);
 
 // 创建 Sequelize 实例
 const sequelize = new Sequelize(
