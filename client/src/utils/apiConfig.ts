@@ -4,6 +4,7 @@ const getApiBaseUrl = () => {
   // 生产环境 - GitHub Pages
   if (process.env.NODE_ENV === 'production') {
     // 指向Render部署的后端服务URL
+    // 当前后后端服务同时提供API和前端静态文件
     return 'https://dating-app-api.onrender.com';
   }
   
