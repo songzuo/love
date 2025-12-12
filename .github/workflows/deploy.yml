@@ -108,6 +108,10 @@ jobs:
           exit 1
         fi
 
-    # 部署步骤（根据您的部署方式调整）
-    - name: Deploy to Production
-      run: echo "Deployment logic goes here"
+    # 部署到GitHub Pages
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./client/dist
+        publish_branch: gh-pages
