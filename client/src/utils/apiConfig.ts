@@ -3,9 +3,8 @@
 const getApiBaseUrl = () => {
   // 生产环境 - GitHub Pages
   if (process.env.NODE_ENV === 'production') {
-    // 当后端部署完成后，这里应该指向您的后端服务URL
-    // 例如: return 'https://your-backend-service.onrender.com';
-    return ''; // 暂时返回空字符串，使用相对路径
+    // 指向Render部署的后端服务URL
+    return 'https://dating-app-api.onrender.com';
   }
   
   // 开发环境
