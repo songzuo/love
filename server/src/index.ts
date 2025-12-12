@@ -7,6 +7,7 @@ import authRoutes from './routes/auth'
 import userRoutes from './routes/users'
 import adminRoutes from './routes/admin'
 import messageRoutes from './routes/messages'
+import path from 'path'
 
 // Load environment variables
 dotenv.config()
@@ -18,12 +19,17 @@ const app = express()
 connectDB()
 
 // Initialize models and relationships
-const { User, Message } = createModels(sequelize)
+const { User, Message } = createModels(sequelize) as { User: any, Message: any }
 
 // Middleware
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+// Serve static files from client build directory
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../../client/dist')));
+}
 
 // Routes
 app.use('/api/auth', authRoutes)
@@ -35,6 +41,14 @@ app.use('/api/messages', messageRoutes)
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Dating App API is running' })
 })
+
+// Serve frontend static files in production
+if (process.env.NODE_ENV === 'production') {
+  // Handle React routing, return all requests to React app
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+  });
+}
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
