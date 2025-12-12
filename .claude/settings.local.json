@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git push:*)",
+      "Bash(ping:*)",
+      "Bash(git config:*)",
+      "Bash(nslookup:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(ssh:*)",
+      "Bash(curl:*)",
+      "Bash(ipconfig:*)",
+      "Bash(netsh:*)",
+      "Bash(powershell:*)",
+      "Bash(git remote get-url:*)",
+      "Bash(gh:*)",
+      "Bash(git --version)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
