@@ -210,3 +210,4 @@ npm run build
 ## 许可证
 
 MIT
+Check GitHub Pages settings
