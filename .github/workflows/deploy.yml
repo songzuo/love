@@ -13,26 +13,47 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # 设置Node.js版本
+    # 检查环境信息
+    - name: Check environment
+      run: |
+        echo "Current directory: $(pwd)"
+        echo "Directory contents:"
+        ls -la
+        node --version
+        npm --version
+
+    # 设置Node.js版本（不使用缓存，避免缓存问题）
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        cache: 'npm'
+        cache: ''  # 禁用npm缓存
 
-    # 安装前端依赖并构建
-    - name: Build Frontend
+    # 检查Node.js和npm版本
+    - name: Check Node.js and npm versions
+      run: |
+        node --version
+        npm --version
+
+    # 安装前端依赖
+    - name: Install frontend dependencies
       working-directory: ./client
-      run: |
-        npm install --verbose
-        npm run build
+      run: npm install --verbose
 
-    # 安装后端依赖并构建
-    - name: Build Backend
+    # 构建前端
+    - name: Build frontend
+      working-directory: ./client
+      run: npm run build
+
+    # 安装后端依赖
+    - name: Install backend dependencies
       working-directory: ./server
-      run: |
-        npm install --verbose
-        npm run build
+      run: npm install --verbose
+
+    # 构建后端
+    - name: Build backend
+      working-directory: ./server
+      run: npm run build
 
     # 部署步骤（根据您的部署方式调整）
     - name: Deploy to Production
