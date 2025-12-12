@@ -2,7 +2,7 @@ services:
   - type: web
     name: dating-app-api
     env: node
-    rootDir: /
+    rootDir: .
     buildCommand: npm install
     startCommand: npm run start
     envVars:
