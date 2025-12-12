@@ -46,22 +46,46 @@ jobs:
     # 安装前端依赖
     - name: Install frontend dependencies
       working-directory: ./client
-      run: npm install --verbose
+      run: |
+        echo "Starting frontend npm install..."
+        npm install --verbose || {
+          echo "ERROR: Frontend npm install failed"
+          exit 1
+        }
 
     # 构建前端
     - name: Build frontend
       working-directory: ./client
-      run: npm run build
+      run: |
+        echo "Starting frontend build..."
+        npm run build || {
+          echo "ERROR: Frontend build failed"
+          echo "Checking build output directory..."
+          ls -la || true
+          exit 1
+        }
 
     # 安装后端依赖
     - name: Install backend dependencies
       working-directory: ./server
-      run: npm install --verbose
+      run: |
+        echo "Starting backend npm install..."
+        npm install --verbose || {
+          echo "ERROR: Backend npm install failed"
+          exit 1
+        }
 
     # 构建后端
     - name: Build backend
       working-directory: ./server
-      run: npm run build
+      run: |
+        echo "Starting backend build..."
+        npm run build || {
+          echo "ERROR: Backend build failed"
+          echo "Checking build output directory..."
+          ls -la || true
+          exit 1
+        }
 
     # 部署步骤（根据您的部署方式调整）
     - name: Deploy to Production
