@@ -4,3 +4,20 @@ services:
     env: node
     buildCommand: npm install
     startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        value: dpg-d4u9oem3jp1c73dtqr9g-a
+      - key: DB_PORT
+        value: 5432
+      - key: DB_NAME
+        value: love_tmwe
+      - key: DB_USERNAME
+        value: love
+      - key: DB_PASSWORD
+        value: wkw659QxAYHl26SWQPnYcMtAFjBfIifP
+      - key: JWT_SECRET
+        value: your_secure_jwt_secret_here_change_me
