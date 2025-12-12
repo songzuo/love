@@ -1,4 +1,4 @@
-import jwt, { SignOptions } from 'jsonwebtoken'
+import * as jwt from 'jsonwebtoken'
 
 interface JwtPayload {
   userId: string
@@ -9,8 +9,8 @@ interface JwtPayload {
 export const generateToken = (payload: JwtPayload): string => {
   const secret = process.env.JWT_SECRET || 'your_jwt_secret_key_here'
   const expiresIn = process.env.JWT_EXPIRES_IN || '7d'
-  const options: SignOptions = { expiresIn: expiresIn as string }
-  return jwt.sign(payload, secret, options)
+  // 使用类型断言确保expiresIn参数类型正确
+  return jwt.sign(payload, secret, { expiresIn: expiresIn as jwt.SignOptions['expiresIn'] })
 }
 
 export const verifyToken = (token: string): JwtPayload => {

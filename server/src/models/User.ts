@@ -1,29 +1,20 @@
-import { Model, DataTypes, Sequelize } from 'sequelize'
+import { Model, DataTypes, Sequelize, InferAttributes, InferCreationAttributes } from 'sequelize'
 import bcrypt from 'bcryptjs'
 
-interface UserAttributes {
-  id: number
-  username: string
-  email: string
-  password: string
-  role: 'user' | 'admin'
-  status: 'active' | 'inactive'
-  createdAt: Date
-  updatedAt: Date
-  comparePassword(candidatePassword: string): Promise<boolean>
-}
-
-interface UserCreationAttributes extends Omit<UserAttributes, 'id' | 'createdAt' | 'updatedAt' | 'comparePassword'> {}
-
-class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-  public id!: number
-  public username!: string
-  public email!: string
-  public password!: string
-  public role!: 'user' | 'admin'
-  public status!: 'active' | 'inactive'
-  public createdAt!: Date
-  public updatedAt!: Date
+// 使用InferAttributes和InferCreationAttributes来正确推断模型属性类型
+class User extends Model<
+  InferAttributes<User>,
+  InferCreationAttributes<User, { omit: 'id' | 'createdAt' | 'updatedAt' | 'comparePassword' }>
+> {
+  // 数据库字段
+  declare id: number
+  declare username: string
+  declare email: string
+  declare password: string
+  declare role: 'user' | 'admin'
+  declare status: 'active' | 'inactive'
+  declare createdAt: Date
+  declare updatedAt: Date
 
   // 实例方法：比较密码
   public async comparePassword(candidatePassword: string): Promise<boolean> {
