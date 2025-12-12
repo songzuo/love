@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { User } from '../index'
+import { Op } from 'sequelize'
 
 // @desc    Get current user profile
 // @route   GET /api/users/profile
@@ -27,8 +28,8 @@ export const updateUserProfile = async (req: any, res: Response) => {
     // Check if username or email is already taken by another user
     const existingUser = await User.findOne({
       where: {
-        [User.sequelize?.Op.or]: [{ email }, { username }],
-        id: { [User.sequelize?.Op.ne]: req.user.id }
+        [Op.or]: [{ email }, { username }],
+        id: { [Op.ne]: req.user.id }
       }
     })
     if (existingUser) {

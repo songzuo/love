@@ -9,7 +9,7 @@ interface JwtPayload {
 export const generateToken = (payload: JwtPayload): string => {
   const secret = process.env.JWT_SECRET || 'your_jwt_secret_key_here'
   const expiresIn = process.env.JWT_EXPIRES_IN || '7d'
-  return jwt.sign(payload, secret, { expiresIn })
+  return jwt.sign(payload, secret, { expiresIn: expiresIn as string })
 }
 
 export const verifyToken = (token: string): JwtPayload => {

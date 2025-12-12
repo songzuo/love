@@ -35,7 +35,7 @@ export const register = async (req: Request, res: Response) => {
     }
 
     // Create new user
-    const user = await User.create({ username, email, password })
+    const user = await User.create({ username, email, password, role: 'user', status: 'active' })
 
     // Generate token
     const token = generateToken({
