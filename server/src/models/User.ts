@@ -29,14 +29,6 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public async comparePassword(candidatePassword: string): Promise<boolean> {
     return bcrypt.compare(candidatePassword, this.password)
   }
-
-  // 静态方法：在创建或更新用户之前加密密码
-  public static async beforeSave(user: User): Promise<void> {
-    if (user.changed('password')) {
-      const salt = await bcrypt.genSalt(Number(process.env.BCRYPT_SALT_ROUNDS || 10))
-      user.password = await bcrypt.hash(user.password, salt)
-    }
-  }
 }
 
 const UserModel = (sequelize: Sequelize) => {
@@ -121,12 +113,17 @@ const UserModel = (sequelize: Sequelize) => {
     {
       sequelize,
       tableName: 'users',
-      timestamps: true,
-      hooks: {
-        beforeSave: User.beforeSave
-      }
+      timestamps: true
     }
   )
+
+  // 在创建或更新用户之前加密密码
+  User.addHook('beforeSave', async (user: User) => {
+    if (user.changed('password')) {
+      const salt = await bcrypt.genSalt(Number(process.env.BCRYPT_SALT_ROUNDS || 10))
+      user.password = await bcrypt.hash(user.password, salt)
+    }
+  })
 
   return User
 }
