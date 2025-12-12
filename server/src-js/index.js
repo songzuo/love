@@ -15,6 +15,11 @@ const favoritesRoutes = require('./routes/favorites');
 // Load environment variables
 dotenv.config();
 
+// Log environment info
+console.log('Starting server...');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('PORT:', process.env.PORT);
+
 // Initialize express app
 const app = express();
 
@@ -23,7 +28,14 @@ app.locals.User = User;
 app.locals.Message = Message;
 
 // Connect to database
-connectDB();
+console.log('Connecting to database...');
+connectDB()
+  .then(() => {
+    console.log('Database connected successfully');
+  })
+  .catch((error) => {
+    console.error('Failed to connect to database:', error);
+  });
 
 // Middleware
 app.use(cors());
@@ -58,10 +70,22 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// Error handling middleware
+// Enhanced error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
+  console.error('Unhandled error:', err);
+  console.error('Error stack:', err.stack);
+  
+  // In development, provide more detailed error information
+  if (process.env.NODE_ENV === 'development') {
+    res.status(500).json({ 
+      message: 'Something went wrong!',
+      error: err.message,
+      stack: err.stack
+    });
+  } else {
+    // In production, provide generic error message
+    res.status(500).json({ message: 'Something went wrong!' });
+  }
 });
 
 // Start server
