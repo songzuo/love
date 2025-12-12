@@ -87,6 +87,27 @@ jobs:
           exit 1
         }
 
+    # 验证构建结果
+    - name: Verify build results
+      run: |
+        echo "Checking client build output..."
+        if [ -d ./client/dist ]; then
+          echo "✅ Client build output exists"
+          ls -la ./client/dist
+        else
+          echo "❌ Client build output missing"
+          exit 1
+        fi
+        
+        echo "\nChecking server build output..."
+        if [ -d ./server/dist ]; then
+          echo "✅ Server build output exists"
+          ls -la ./server/dist
+        else
+          echo "❌ Server build output missing"
+          exit 1
+        fi
+
     # 部署步骤（根据您的部署方式调整）
     - name: Deploy to Production
       run: echo "Deployment logic goes here"
