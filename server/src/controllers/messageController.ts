@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { Message, User } from '../index'
+import { Op } from 'sequelize'
 
 interface SendMessageRequest {
   recipientId: number
@@ -24,7 +25,8 @@ export const sendMessage = async (req: any, res: Response) => {
     const message = await Message.create({
       senderId: Number(senderId),
       recipientId,
-      content
+      content,
+      isRead: false
     })
 
     // Populate sender and recipient information
@@ -59,7 +61,7 @@ export const getMessages = async (req: any, res: Response) => {
     // Get all messages where user is sender or recipient
     const messages = await Message.findAll({
       where: {
-        [Message.sequelize?.Op.or]: [
+        [Op.or]: [
           { senderId: Number(userId) },
           { recipientId: Number(userId) }
         ]
@@ -98,7 +100,7 @@ export const getConversation = async (req: any, res: Response) => {
     // Get conversation between current user and other user
     const messages = await Message.findAll({
       where: {
-        [Message.sequelize?.Op.or]: [
+        [Op.or]: [
           { senderId: Number(currentUserId), recipientId: otherUserId },
           { senderId: otherUserId, recipientId: Number(currentUserId) }
         ]
@@ -178,7 +180,7 @@ export const deleteMessage = async (req: any, res: Response) => {
     const message = await Message.findOne({
       where: {
         id: messageId,
-        [Message.sequelize?.Op.or]: [
+        [Op.or]: [
           { senderId: Number(userId) },
           { recipientId: Number(userId) }
         ]

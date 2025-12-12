@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { User } from '../index'
+import { Op } from 'sequelize'
 import { generateToken } from '../utils/jwt'
 
 interface RegisterRequest {
@@ -23,7 +24,7 @@ export const register = async (req: Request, res: Response) => {
     // Check if user already exists
     const existingUser = await User.findOne({
       where: {
-        [User.sequelize?.Op.or]: [{ email }, { username }]
+        [Op.or]: [{ email }, { username }]
       }
     })
     if (existingUser) {

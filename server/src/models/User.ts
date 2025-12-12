@@ -31,7 +31,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   }
 
   // 静态方法：在创建或更新用户之前加密密码
-  public static beforeSave = async (user: User) => {
+  public static async beforeSave(user: User): Promise<void> {
     if (user.changed('password')) {
       const salt = await bcrypt.genSalt(Number(process.env.BCRYPT_SALT_ROUNDS || 10))
       user.password = await bcrypt.hash(user.password, salt)
