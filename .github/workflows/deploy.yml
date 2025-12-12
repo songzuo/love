@@ -35,6 +35,14 @@ jobs:
         node --version
         npm --version
 
+    # 检查npm配置和环境变量
+    - name: Check npm configuration and environment variables
+      run: |
+        echo "npm configuration:" 
+        npm config list
+        echo "\nEnvironment variables:" 
+        env | grep -E "NODE|NPM|GITHUB"
+
     # 安装前端依赖
     - name: Install frontend dependencies
       working-directory: ./client
