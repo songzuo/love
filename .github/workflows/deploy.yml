@@ -13,18 +13,25 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    # 设置Node.js版本
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
     # 安装前端依赖并构建
     - name: Build Frontend
       working-directory: ./client
       run: |
-        npm install
+        npm install --verbose
         npm run build
 
     # 安装后端依赖并构建
     - name: Build Backend
       working-directory: ./server
       run: |
-        npm install
+        npm install --verbose
         npm run build
 
     # 部署步骤（根据您的部署方式调整）
