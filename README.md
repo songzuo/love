@@ -1,6 +1,70 @@
 # 婚恋交友网站
 
-一个基于 React + TypeScript + Node.js + Express + MongoDB 的婚恋交友网站，包含管理员后台管理功能。
+一个基于React + Express + TypeScript的婚恋交友网站，包含前端、后端和完整的部署流程。
+
+## 技术栈
+
+### 前端
+- React 18
+- TypeScript
+- Vite
+- React Router
+- Axios
+
+### 后端
+- Express
+- TypeScript
+- Sequelize
+- PostgreSQL
+- JWT认证
+
+## 功能特性
+
+- 用户注册、登录、个人资料管理
+- 匹配系统
+- 消息系统
+- 收藏功能
+- 管理员后台
+
+## 部署
+
+项目使用GitHub Actions自动部署到GitHub Pages。
+
+### 前端访问地址
+https://songzuo.github.io/love/
+
+### 后端API
+API部署在相应的服务器上，前端通过代理访问。
+
+## 开发环境
+
+### 前端开发
+```bash
+cd client
+npm install
+npm run dev
+```
+
+### 后端开发
+```bash
+cd server
+npm install
+npm run js-dev
+```
+
+## 构建
+
+### 前端构建
+```bash
+cd client
+npm run build
+```
+
+### 后端构建
+```bash
+cd server
+npm run build
+```
 
 ## 项目结构
 
