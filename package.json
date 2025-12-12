@@ -1,0 +1,25 @@
+{
+  "name": "dating-app-fullstack",
+  "version": "1.0.0",
+  "description": "婚恋交友网站全栈应用",
+  "scripts": {
+    "build": "cd server && npm run build",
+    "start": "cd server && npm run start",
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\"",
+    "install-server": "cd server && npm install",
+    "install-client": "cd client && npm install",
+    "postinstall": "npm run install-server && npm run install-client"
+  },
+  "keywords": [
+    "dating",
+    "fullstack",
+    "react",
+    "express",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.0.0"
+  }
+}
