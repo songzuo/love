@@ -2,10 +2,10 @@ import { Model, DataTypes, Sequelize, InferAttributes, InferCreationAttributes }
 import bcrypt from 'bcryptjs'
 
 // 使用InferAttributes和InferCreationAttributes来正确推断模型属性类型
-class User extends Model<
-  InferAttributes<User>,
-  InferCreationAttributes<User, { omit: 'id' | 'createdAt' | 'updatedAt' | 'comparePassword' }>
-> {
+export type UserAttributes = InferAttributes<User>
+export type UserCreationAttributes = InferCreationAttributes<User, { omit: 'id' | 'createdAt' | 'updatedAt' | 'comparePassword' }>
+
+class User extends Model<UserAttributes, UserCreationAttributes> {
   // 数据库字段
   declare id: number
   declare username: string
