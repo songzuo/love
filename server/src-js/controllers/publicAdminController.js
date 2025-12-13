@@ -42,6 +42,26 @@ const getAllUsers = async (req, res) => {
     }
     catch (error) {
         console.error('Error in getAllUsers:', error);
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+        // 检查特定的数据库错误
+        if (error.name === 'SequelizeConnectionRefusedError') {
+            console.error('Database connection refused');
+            return res.status(500).json({
+                success: false,
+                message: 'Database connection error',
+                error: 'Unable to connect to database'
+            });
+        }
+        if (error.name === 'SequelizeHostNotFoundError') {
+            console.error('Database host not found');
+            return res.status(500).json({
+                success: false,
+                message: 'Database host error',
+                error: 'Database host not found'
+            });
+        }
         // 确保始终返回JSON格式的响应
         const errorResponse = {
             success: false,
