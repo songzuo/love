@@ -1,5 +1,5 @@
 # Compiled output
-src-js/
+dist/
 
 # Dependencies
 node_modules/
