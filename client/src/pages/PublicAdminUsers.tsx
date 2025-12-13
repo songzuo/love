@@ -25,16 +25,24 @@ const PublicAdminUsers = () => {
   const fetchUsers = async () => {
     try {
       const response = await axios.get('/api/public-admin/users')
+      console.log('API Response:', response.data); // 调试信息
       
       // 确保响应数据是数组格式
-      if (Array.isArray(response.data)) {
+      if (response.data && response.data.success && Array.isArray(response.data.users)) {
+        setUsers(response.data.users)
+      } else if (response.data && typeof response.data === 'object' && response.data.users && Array.isArray(response.data.users)) {
+        // 如果数据嵌套在users属性中
+        setUsers(response.data.users)
+      } else if (Array.isArray(response.data)) {
+        // 兼容旧格式
         setUsers(response.data)
       } else {
         console.error('Unexpected data format:', response.data)
-        setError('数据格式错误')
+        setError('数据格式错误: 期望包含users数组的对象，但收到 ' + typeof response.data)
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || '获取用户列表失败')
+      console.error('API Error:', err); // 调试信息
+      setError(err.response?.data?.message || err.message || '获取用户列表失败')
     } finally {
       setLoading(false)
     }
@@ -46,12 +54,17 @@ const PublicAdminUsers = () => {
     }
     try {
       const response = await axios.put(`/api/public-admin/users/${userId}/promote`, {})
-      setUsers(users.map(user => 
-        user.id === userId ? { ...user, role: response.data.user.role } : user
-      ))
-      alert('用户已成功提升为管理员！')
+      // 确保响应数据包含user对象
+      if (response.data && response.data.user) {
+        setUsers(users.map(user => 
+          user.id === userId ? { ...user, role: response.data.user.role } : user
+        ))
+        alert('用户已成功提升为管理员！')
+      } else {
+        throw new Error('响应数据格式不正确')
+      }
     } catch (err: any) {
-      alert(err.response?.data?.message || '提升用户失败')
+      alert(err.response?.data?.message || err.message || '提升用户失败')
     }
   }
 
@@ -61,12 +74,17 @@ const PublicAdminUsers = () => {
     }
     try {
       const response = await axios.put(`/api/public-admin/users/${userId}/demote`, {})
-      setUsers(users.map(user => 
-        user.id === userId ? { ...user, role: response.data.user.role } : user
-      ))
-      alert('管理员已成功降级为普通用户！')
+      // 确保响应数据包含user对象
+      if (response.data && response.data.user) {
+        setUsers(users.map(user => 
+          user.id === userId ? { ...user, role: response.data.user.role } : user
+        ))
+        alert('管理员已成功降级为普通用户！')
+      } else {
+        throw new Error('响应数据格式不正确')
+      }
     } catch (err: any) {
-      alert(err.response?.data?.message || '降级用户失败')
+      alert(err.response?.data?.message || err.message || '降级用户失败')
     }
   }
 
@@ -83,7 +101,13 @@ const PublicAdminUsers = () => {
   }
 
   if (error) {
-    return <div style={{ textAlign: 'center', padding: '2rem', color: '#ff6b6b' }}>{error}</div>
+    return (
+      <div style={{ textAlign: 'center', padding: '2rem', color: '#ff6b6b' }}>
+        <h3>错误</h3>
+        <p>{error}</p>
+        <button onClick={fetchUsers} className="btn btn-primary">重试</button>
+      </div>
+    )
   }
 
   return (

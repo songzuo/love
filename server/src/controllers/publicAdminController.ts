@@ -11,10 +11,21 @@ export const getAllUsers = async (req: any, res: Response) => {
     
     const users = await User.findAll()
     // 确保返回纯JavaScript对象而不是Sequelize实例
-    res.status(200).json(users.map((user: any) => user.toJSON ? user.toJSON() : user))
+    const plainUsers = users.map((user: any) => user.toJSON ? user.toJSON() : user)
+    
+    // 返回明确的数据结构
+    res.status(200).json({
+      success: true,
+      users: plainUsers,
+      count: plainUsers.length
+    })
   } catch (error) {
     console.error('Error in getAllUsers:', error)
-    res.status(500).json({ message: 'Server error' })
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    })
   }
 }
 
