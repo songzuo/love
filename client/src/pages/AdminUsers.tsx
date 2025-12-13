@@ -53,23 +53,39 @@ const AdminUsers = () => {
     }
   }
 
-  const handleRoleChange = async (userId: number, newRole: string) => {
-    if (!window.confirm(`确定要将该用户角色改为 ${newRole === 'admin' ? '管理员' : '普通用户'} 吗？`)) {
+  const handlePromoteToAdmin = async (userId: number) => {
+    if (!window.confirm('确定要将该用户提升为管理员吗？')) {
       return
     }
     try {
       const token = localStorage.getItem('token')
-      await axios.put(`/api/admin/users/${userId}/role`, {
-        role: newRole
-      }, {
+      const response = await axios.put(`/api/admin/users/${userId}/promote`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       })
       setUsers(users.map(user => 
-        user.id === userId ? { ...user, role: newRole } : user
+        user.id === userId ? { ...user, role: response.data.user.role } : user
       ))
-      alert('角色更新成功！')
+      alert('用户已成功提升为管理员！')
     } catch (err: any) {
-      alert(err.response?.data?.message || '更新角色失败')
+      alert(err.response?.data?.message || '提升用户失败')
+    }
+  }
+
+  const handleDemoteToUser = async (userId: number) => {
+    if (!window.confirm('确定要将该管理员降级为普通用户吗？')) {
+      return
+    }
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.put(`/api/admin/users/${userId}/demote`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      setUsers(users.map(user => 
+        user.id === userId ? { ...user, role: response.data.user.role } : user
+      ))
+      alert('管理员已成功降级为普通用户！')
+    } catch (err: any) {
+      alert(err.response?.data?.message || '降级用户失败')
     }
   }
 
@@ -152,14 +168,9 @@ const AdminUsers = () => {
               <td>{user.username}</td>
               <td>{user.email}</td>
               <td>
-                <select 
-                  value={user.role} 
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleRoleChange(user.id, e.target.value)}
-                  className="role-select"
-                >
-                  <option value="user">普通用户</option>
-                  <option value="admin">管理员</option>
-                </select>
+                <span className={`role-badge ${user.role}`}>
+                  {user.role === 'admin' ? '管理员' : '普通用户'}
+                </span>
               </td>
               <td>
                 <span className={`status-badge ${user.status}`}>
@@ -168,9 +179,25 @@ const AdminUsers = () => {
               </td>
               <td>{new Date(user.createdAt).toLocaleString()}</td>
               <td>
+                {user.role === 'admin' ? (
+                  <button
+                    className="btn btn-sm btn-warning"
+                    onClick={() => handleDemoteToUser(user.id)}
+                  >
+                    降级
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-sm btn-success"
+                    onClick={() => handlePromoteToAdmin(user.id)}
+                  >
+                    提升
+                  </button>
+                )}
                 <button
                   className="btn btn-sm btn-secondary"
                   onClick={() => handleStatusChange(user.id, user.status === 'active' ? 'inactive' : 'active')}
+                  style={{ marginLeft: '0.5rem' }}
                 >
                   {user.status === 'active' ? '禁用' : '启用'}
                 </button>

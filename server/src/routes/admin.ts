@@ -1,6 +1,7 @@
 import express from 'express'
 import { auth, admin } from '../middleware/auth'
 import { getAllUsers, updateUserStatus, deleteUser } from '../controllers/userController'
+import { promoteToAdmin, demoteToUser } from '../controllers/adminController'
 
 const router = express.Router()
 
@@ -16,6 +17,16 @@ router.get('/users', getAllUsers)
 // @desc    Update user status
 // @access  Private/Admin
 router.put('/users/:id/status', updateUserStatus)
+
+// @route   PUT /api/admin/users/:id/promote
+// @desc    Promote user to admin
+// @access  Private/Admin
+router.put('/users/:id/promote', promoteToAdmin)
+
+// @route   PUT /api/admin/users/:id/demote
+// @desc    Demote admin to user
+// @access  Private/Admin
+router.put('/users/:id/demote', demoteToUser)
 
 // @route   DELETE /api/admin/users/:id
 // @desc    Delete user

@@ -11,39 +11,36 @@ const initializeDatabase = async () => {
       return;
     }
     
-    // 设置指定用户为管理员
-    const user1 = await User.findOne({ where: { email: 'bigasong5@gmail.com' } });
-    if (user1) {
-      await user1.update({ role: 'admin' });
-      console.log('Updated bigasong5@gmail.com to admin');
-    } else {
-      console.log('User bigasong5@gmail.com not found');
-    }
+    // 管理员账户信息
+    const adminUsers = [
+      { email: 'bigasong5@gmail.com', username: 'bigasong5', password: 'admin123' },
+      { email: 'bigasong4@gmail.com', username: 'bigasong4', password: 'admin123' },
+      { email: 'admin@admin.com', username: 'admin', password: '123456' }
+    ];
     
-    // 创建新的管理员用户
-    const adminEmail = 'admin@admin.com';
-    const adminPassword = '123456';
-    
-    const existingAdmin = await User.findOne({ where: { email: adminEmail } });
-    if (!existingAdmin) {
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(adminPassword, salt);
-      
-      const adminUser = await User.create({
-        username: 'admin',
-        email: adminEmail,
-        password: hashedPassword,
-        role: 'admin',
-        status: 'active'
-      });
-      
-      console.log('Created admin user:', adminUser.email);
-    } else {
-      console.log('Admin user already exists');
-      // 确保现有管理员用户的角色是admin
-      if (existingAdmin.role !== 'admin') {
-        await existingAdmin.update({ role: 'admin' });
-        console.log('Updated existing admin user role');
+    // 创建或更新管理员用户
+    for (const adminInfo of adminUsers) {
+      const existingAdmin = await User.findOne({ where: { email: adminInfo.email } });
+      if (!existingAdmin) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(adminInfo.password, salt);
+        
+        const adminUser = await User.create({
+          username: adminInfo.username,
+          email: adminInfo.email,
+          password: hashedPassword,
+          role: 'admin',
+          status: 'active'
+        });
+        
+        console.log('Created admin user:', adminUser.email);
+      } else {
+        console.log('Admin user already exists:', adminInfo.email);
+        // 确保现有管理员用户的角色是admin
+        if (existingAdmin.role !== 'admin') {
+          await existingAdmin.update({ role: 'admin' });
+          console.log('Updated existing user to admin:', adminInfo.email);
+        }
       }
     }
     
