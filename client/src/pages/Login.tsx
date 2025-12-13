@@ -91,8 +91,17 @@ const Login = () => {
           <p style={{ margin: '0.25rem 0' }}><strong>邮箱:</strong> admin@admin.com</p>
           <p style={{ margin: '0.25rem 0' }}><strong>密码:</strong> 123456</p>
           <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.8rem', color: '#6c757d' }}>
-            也可使用 bigasong5@gmail.com 登录（已设为管理员）
+            也可使用 bigasong5@gmail.com 或 bigasong4@gmail.com 登录（已设为管理员）
           </p>
+          
+          {/* 公共管理页面链接 */}
+          <div style={{ marginTop: '1rem', paddingTop: '0.5rem', borderTop: '1px solid #bee5eb' }}>
+            <p style={{ margin: '0.25rem 0', fontSize: '0.85rem' }}>
+              <Link to="/public-admin/users" style={{ color: '#007bff', textDecoration: 'underline' }}>
+                直接管理用户（无需登录）
+              </Link>
+            </p>
+          </div>
         </div>
         
         <p style={{ marginTop: '1rem', textAlign: 'center' }}>

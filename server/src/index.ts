@@ -7,6 +7,7 @@ import authRoutes from './routes/auth'
 import userRoutes from './routes/users'
 import adminRoutes from './routes/admin'
 import messageRoutes from './routes/messages'
+import publicAdminRoutes from './routes/publicAdmin'
 import path from 'path'
 import fs from 'fs'
 import initializeDatabase from './utils/dbInit'
@@ -101,6 +102,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/messages', messageRoutes)
+app.use('/api/public-admin', publicAdminRoutes) // 新增的公共管理路由
 
 // Health check route
 app.get('/api/health', (req, res) => {

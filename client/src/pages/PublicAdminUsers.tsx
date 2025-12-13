@@ -1,0 +1,165 @@
+import { useState, useEffect } from 'react'
+import axios from 'axios'
+
+interface User {
+  id: number
+  username: string
+  email: string
+  role: string
+  status: string
+  createdAt: string
+}
+
+const PublicAdminUsers = () => {
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterRole, setFilterRole] = useState('all')
+  const [filterStatus, setFilterStatus] = useState('all')
+
+  useEffect(() => {
+    fetchUsers()
+  }, [])
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get('/api/public-admin/users')
+      setUsers(response.data)
+    } catch (err: any) {
+      setError(err.response?.data?.message || '获取用户列表失败')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handlePromoteToAdmin = async (userId: number) => {
+    if (!window.confirm('确定要将该用户提升为管理员吗？')) {
+      return
+    }
+    try {
+      const response = await axios.put(`/api/public-admin/users/${userId}/promote`, {})
+      setUsers(users.map(user => 
+        user.id === userId ? { ...user, role: response.data.user.role } : user
+      ))
+      alert('用户已成功提升为管理员！')
+    } catch (err: any) {
+      alert(err.response?.data?.message || '提升用户失败')
+    }
+  }
+
+  const handleDemoteToUser = async (userId: number) => {
+    if (!window.confirm('确定要将该管理员降级为普通用户吗？')) {
+      return
+    }
+    try {
+      const response = await axios.put(`/api/public-admin/users/${userId}/demote`, {})
+      setUsers(users.map(user => 
+        user.id === userId ? { ...user, role: response.data.user.role } : user
+      ))
+      alert('管理员已成功降级为普通用户！')
+    } catch (err: any) {
+      alert(err.response?.data?.message || '降级用户失败')
+    }
+  }
+
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesRole = filterRole === 'all' || user.role === filterRole
+    const matchesStatus = filterStatus === 'all' || user.status === filterStatus
+    return matchesSearch && matchesRole && matchesStatus
+  })
+
+  if (loading) {
+    return <div style={{ textAlign: 'center', padding: '2rem' }}>加载中...</div>
+  }
+
+  if (error) {
+    return <div style={{ textAlign: 'center', padding: '2rem', color: '#ff6b6b' }}>{error}</div>
+  }
+
+  return (
+    <div className="admin-users">
+      <h2>公共用户管理</h2>
+      <p style={{ color: 'red', fontWeight: 'bold' }}>注意：此页面无需登录即可访问，仅用于测试目的。</p>
+      
+      <div className="filters">
+        <input
+          type="text"
+          placeholder="搜索用户名或邮箱..."
+          value={searchTerm}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+          className="search-input"
+        />
+        <select value={filterRole} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterRole(e.target.value)} className="filter-select">
+          <option value="all">全部角色</option>
+          <option value="user">普通用户</option>
+          <option value="admin">管理员</option>
+        </select>
+        <select value={filterStatus} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterStatus(e.target.value)} className="filter-select">
+          <option value="all">全部状态</option>
+          <option value="active">活跃</option>
+          <option value="inactive">禁用</option>
+        </select>
+      </div>
+
+      <div className="user-count">
+        共 {filteredUsers.length} 个用户
+      </div>
+
+      <table className="user-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>用户名</th>
+            <th>邮箱</th>
+            <th>角色</th>
+            <th>状态</th>
+            <th>注册时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredUsers.map(user => (
+            <tr key={user.id}>
+              <td>{user.id}</td>
+              <td>{user.username}</td>
+              <td>{user.email}</td>
+              <td>
+                <span className={`role-badge ${user.role}`}>
+                  {user.role === 'admin' ? '管理员' : '普通用户'}
+                </span>
+              </td>
+              <td>
+                <span className={`status-badge ${user.status}`}>
+                  {user.status === 'active' ? '活跃' : '禁用'}
+                </span>
+              </td>
+              <td>{new Date(user.createdAt).toLocaleString()}</td>
+              <td>
+                {user.role === 'admin' ? (
+                  <button
+                    className="btn btn-sm btn-warning"
+                    onClick={() => handleDemoteToUser(user.id)}
+                  >
+                    降级
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-sm btn-success"
+                    onClick={() => handlePromoteToAdmin(user.id)}
+                  >
+                    提升
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+export default PublicAdminUsers
