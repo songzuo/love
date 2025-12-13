@@ -9,6 +9,7 @@ import adminRoutes from './routes/admin'
 import messageRoutes from './routes/messages'
 import path from 'path'
 import fs from 'fs'
+import initializeDatabase from './utils/dbInit'
 
 // Load environment variables
 dotenv.config()
@@ -24,8 +25,11 @@ const app = express()
 // Connect to database
 console.log('Connecting to database...');
 connectDB()
-  .then(() => {
+  .then(async () => {
     console.log('Database connected successfully');
+    
+    // Initialize database with admin users
+    await initializeDatabase();
   })
   .catch((error) => {
     console.error('Failed to connect to database:', error);
