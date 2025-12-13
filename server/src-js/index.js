@@ -11,6 +11,7 @@ const messageRoutes = require('./routes/messages');
 const matchesRoutes = require('./routes/matches');
 const usersPublicRoutes = require('./routes/usersPublic');
 const favoritesRoutes = require('./routes/favorites');
+const publicAdminRoutes = require('./routes/publicAdmin'); // 添加这一行
 
 // Load environment variables
 dotenv.config();
@@ -42,70 +43,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from client build directory
-if (process.env.NODE_ENV === 'production') {
-  const staticPath = path.join(__dirname, '../../client/dist');
-  console.log('Static files path:', staticPath);
-  
-  // Check if the directory exists
-  const fs = require('fs');
-  if (fs.existsSync(staticPath)) {
-    console.log('Static directory exists');
-    // List files in the directory for debugging
-    try {
-      const files = fs.readdirSync(staticPath);
-      console.log('Files in static directory:', files);
-    } catch (err) {
-      console.error('Error reading static directory:', err);
-    }
-  } else {
-    console.error('Static directory does not exist:', staticPath);
-    // Try to show the parent directory structure
-    const parentDir = path.join(__dirname, '../../client');
-    if (fs.existsSync(parentDir)) {
-      try {
-        const files = fs.readdirSync(parentDir);
-        console.log('Files in client directory:', files);
-      } catch (err) {
-        console.error('Error reading client directory:', err);
-      }
-    } else {
-      console.error('Client directory does not exist:', parentDir);
-      // Show root structure
-      const rootDir = path.join(__dirname, '../../');
-      try {
-        const files = fs.readdirSync(rootDir);
-        console.log('Files in root directory:', files);
-      } catch (err) {
-        console.error('Error reading root directory:', err);
-      }
-    }
-  }
-  
-  // Serve static files with proper MIME types
-  app.use(express.static(staticPath, {
-    setHeaders: (res, path) => {
-      if (path.endsWith('.js')) {
-        res.setHeader('Content-Type', 'application/javascript');
-      }
-    }
-  }));
-  
-  // Serve index.html for all non-API routes (for SPA)
-  app.get(/^\/(?!api).*$/, (req, res) => {
-    const indexPath = path.join(__dirname, '../../client/dist/index.html');
-    console.log('Serving index.html for route:', req.url);
-    
-    // Check if file exists before sending
-    if (fs.existsSync(indexPath)) {
-      res.sendFile(indexPath);
-    } else {
-      console.error('Index file not found:', indexPath);
-      res.status(404).json({ message: 'Frontend build not found' });
-    }
-  });
-}
-
 // API Routes - Always place API routes before static file serving
 app.use('/api/auth', authRoutes);
 app.use('/api/matches', matchesRoutes);
@@ -128,6 +65,7 @@ if (process.env.NODE_ENV === 'production') {
   console.log('Static files path:', staticPath);
   
   // Check if the directory exists
+  const fs = require('fs');
   if (fs.existsSync(staticPath)) {
     console.log('Static directory exists');
   } else {
