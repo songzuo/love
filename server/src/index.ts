@@ -78,7 +78,14 @@ if (process.env.NODE_ENV === 'production') {
     }
   }
   
-  app.use(express.static(staticPath));
+  // Serve static files with proper MIME types
+  app.use(express.static(staticPath, {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      }
+    }
+  }));
 }
 
 // Routes
