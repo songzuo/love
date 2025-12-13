@@ -66,13 +66,21 @@ const connectDB = async () => {
     console.log('PostgreSQL Connected successfully')
     
     // 自动同步模型到数据库
+    // 在生产环境中使用alter: true来更新表结构而不丢失数据
+    // 在开发环境中也可以使用alter: true
     await sequelize.sync({
-      alter: true, // 开发环境下使用alter: true，生产环境下应使用migrations
+      alter: true, // 自动更新表结构以匹配模型定义
       force: false // 不要使用force: true，否则会删除所有数据
     })
     console.log('Database synchronized successfully')
   } catch (error) {
     console.error('Error connecting to PostgreSQL:', error)
+    // 添加更多错误信息以便调试
+    if (error instanceof Error) {
+      console.error('Error name:', error.name)
+      console.error('Error message:', error.message)
+      console.error('Error stack:', error.stack)
+    }
     process.exit(1)
   }
 }

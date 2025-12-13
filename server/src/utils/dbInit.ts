@@ -20,33 +20,44 @@ const initializeDatabase = async () => {
     
     // 创建或更新管理员用户
     for (const adminInfo of adminUsers) {
-      const existingAdmin = await User.findOne({ where: { email: adminInfo.email } });
-      if (!existingAdmin) {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(adminInfo.password, salt);
-        
-        const adminUser = await User.create({
-          username: adminInfo.username,
-          email: adminInfo.email,
-          password: hashedPassword,
-          role: 'admin',
-          status: 'active'
-        });
-        
-        console.log('Created admin user:', adminUser.email);
-      } else {
-        console.log('Admin user already exists:', adminInfo.email);
-        // 确保现有管理员用户的角色是admin
-        if (existingAdmin.role !== 'admin') {
-          await existingAdmin.update({ role: 'admin' });
-          console.log('Updated existing user to admin:', adminInfo.email);
+      try {
+        const existingAdmin = await User.findOne({ where: { email: adminInfo.email } });
+        if (!existingAdmin) {
+          const salt = await bcrypt.genSalt(10);
+          const hashedPassword = await bcrypt.hash(adminInfo.password, salt);
+          
+          const adminUser = await User.create({
+            username: adminInfo.username,
+            email: adminInfo.email,
+            password: hashedPassword,
+            role: 'admin',
+            status: 'active'
+          });
+          
+          console.log('Created admin user:', adminUser.email);
+        } else {
+          console.log('Admin user already exists:', adminInfo.email);
+          // 确保现有管理员用户的角色是admin
+          if (existingAdmin.role !== 'admin') {
+            await existingAdmin.update({ role: 'admin' });
+            console.log('Updated existing user to admin:', adminInfo.email);
+          }
         }
+      } catch (userError) {
+        console.error(`Error creating/updating admin user ${adminInfo.email}:`, userError);
+        // 继续处理其他管理员用户，不要因为一个用户的错误而停止整个过程
       }
     }
     
     console.log('Database initialization completed');
   } catch (error) {
     console.error('Error initializing database:', error);
+    // 添加更多错误信息以便调试
+    if (error instanceof Error) {
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
   }
 };
 
