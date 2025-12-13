@@ -44,7 +44,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from client build directory
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../../client/dist')));
+  const staticPath = path.join(__dirname, '../../client/dist');
+  console.log('Static files path:', staticPath);
+  app.use(express.static(staticPath));
 }
 
 // Routes
@@ -66,7 +68,17 @@ app.get('/api/health', (req, res) => {
 if (process.env.NODE_ENV === 'production') {
   // Handle React routing, return all requests to React app
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+    const indexPath = path.join(__dirname, '../../client/dist/index.html');
+    console.log('Index file path:', indexPath);
+    
+    // Check if file exists before sending
+    const fs = require('fs');
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      console.error('Index file not found:', indexPath);
+      res.status(404).json({ message: 'Frontend build not found' });
+    }
   });
 }
 
