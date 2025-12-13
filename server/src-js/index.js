@@ -106,7 +106,7 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// Routes
+// API Routes - Always place API routes before static file serving
 app.use('/api/auth', authRoutes);
 app.use('/api/matches', matchesRoutes);
 app.use('/api/admin', adminRoutes);
@@ -115,21 +115,41 @@ app.use('/api/favorites', favoritesRoutes);
 // Note: userRoutes must come before usersPublicRoutes to match /profile first
 app.use('/api/users', userRoutes);
 app.use('/api/users', usersPublicRoutes);
+app.use('/api/public-admin', publicAdminRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Dating App API is running' });
 });
 
-// Serve frontend static files in production
+// Serve static files and handle SPA routing
 if (process.env.NODE_ENV === 'production') {
-  // Handle React routing, return all requests to React app
-  app.get('*', (req, res) => {
+  const staticPath = path.join(__dirname, '../../client/dist');
+  console.log('Static files path:', staticPath);
+  
+  // Check if the directory exists
+  if (fs.existsSync(staticPath)) {
+    console.log('Static directory exists');
+  } else {
+    console.error('Static directory does not exist:', staticPath);
+  }
+  
+  // Serve static files with proper MIME types
+  app.use(express.static(staticPath, {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      }
+    }
+  }));
+  
+  // Serve index.html for all non-API routes (for SPA)
+  // 注意：这个路由必须放在所有API路由之后
+  app.get(/^\/(?!api\/).*/, (req, res) => {
     const indexPath = path.join(__dirname, '../../client/dist/index.html');
-    console.log('Index file path:', indexPath);
+    console.log('Serving index.html for route:', req.url);
     
     // Check if file exists before sending
-    const fs = require('fs');
     if (fs.existsSync(indexPath)) {
       res.sendFile(indexPath);
     } else {
