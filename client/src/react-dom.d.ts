@@ -24,3 +24,20 @@ declare module 'react-dom/client' {
     options?: any
   ): Root;
 }
+
+// Additional React DOM APIs
+declare module 'react-dom' {
+  export function createPortal(children: any, container: Element): any;
+  export function findDOMNode(component: any): Element | null;
+  export function unmountComponentAtNode(container: Element): boolean;
+  
+  // Server-side rendering
+  export function renderToString(element: any): string;
+  export function renderToStaticMarkup(element: any): string;
+  
+  // Hydration
+  export function hydrate(element: any, container: Element | DocumentFragment, callback?: () => void): any;
+  
+  // Rendering
+  export function render(element: any, container: Element | DocumentFragment, callback?: () => void): any;
+}
