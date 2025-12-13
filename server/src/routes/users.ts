@@ -1,13 +1,13 @@
 import express from 'express'
 import { auth } from '../middleware/auth'
-import { getCurrentUser, updateUserProfile, getAllUsers } from '../controllers/userController'
+import { getCurrentUser, updateUserProfile, getUsers } from '../controllers/userController'
 
 const router = express.Router()
 
 // @route   GET /api/users
 // @desc    Get all users for browsing
 // @access  Private
-router.get('/', auth, getAllUsers)
+router.get('/', auth, getUsers)
 
 // @route   GET /api/users/profile
 // @desc    Get current user profile

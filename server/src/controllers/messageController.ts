@@ -59,11 +59,22 @@ export const sendMessage = async (req: any, res: Response) => {
 // @access  Private
 export const getMessages = async (req: any, res: Response) => {
   try {
+    console.log('getMessages called with user:', req.user?.id);
     // 获取模型
     const User = (global as any).User;
     const Message = (global as any).Message;
     
+    if (!User || !Message) {
+      console.error('Models not found:', { User: !!User, Message: !!Message });
+      return res.status(500).json({ 
+        success: false, 
+        message: '获取消息失败',
+        error: 'Models not initialized'
+      });
+    }
+    
     const userId = req.user.id
+    console.log('Fetching messages for user:', userId);
 
     // Get all messages where user is sender or recipient
     const messages = await Message.findAll({
@@ -80,13 +91,22 @@ export const getMessages = async (req: any, res: Response) => {
       order: [['createdAt', 'DESC']]
     })
 
+    console.log('Messages found:', messages.length);
+    // 确保返回纯JavaScript对象
+    const plainMessages = messages.map((message: any) => message.toJSON ? message.toJSON() : message);
+
     res.status(200).json({
+      success: true,
       message: 'Messages retrieved successfully',
-      data: messages
+      data: plainMessages
     })
   } catch (error) {
-    console.error('Error in getMessages:', error)
-    res.status(500).json({ message: 'Server error' })
+    console.error('Error in getMessages:', error);
+    res.status(500).json({ 
+      success: false,
+      message: '获取消息失败',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
 }
 

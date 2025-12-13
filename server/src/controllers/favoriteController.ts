@@ -6,13 +6,18 @@ import { Op } from 'sequelize'
 // @access  Private
 export const getFavorites = async (req: any, res: Response) => {
   try {
+    console.log('getFavorites called with user:', req.user?.id);
     // 获取模型
     const User = (global as any).User;
     const Favorite = (global as any).Favorite;
     const currentUserId = req.user.id;
     
+    console.log('User model found:', !!User);
+    console.log('Favorite model found:', !!Favorite);
+    
     // 检查Favorite模型是否存在
     if (!Favorite) {
+      console.error('Favorite model not found');
       return res.status(200).json({ 
         success: true,
         favorites: [],
@@ -35,6 +40,7 @@ export const getFavorites = async (req: any, res: Response) => {
       order: [['createdAt', 'DESC']]
     });
     
+    console.log('Favorites found:', favorites.length);
     // 确保返回纯JavaScript对象
     const plainFavorites = favorites.map((favorite: any) => {
       const fav = favorite.toJSON ? favorite.toJSON() : favorite;

@@ -40,7 +40,7 @@ const MessageModel = (sequelize: Sequelize) => {
       senderId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        field: 'sender_id',
+        field: 'senderId',
         references: {
           model: 'users',
           key: 'id'
@@ -51,7 +51,7 @@ const MessageModel = (sequelize: Sequelize) => {
       recipientId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        field: 'recipient_id',
+        field: 'recipientId',
         references: {
           model: 'users',
           key: 'id'
@@ -70,25 +70,29 @@ const MessageModel = (sequelize: Sequelize) => {
       },
       isRead: {
         type: DataTypes.BOOLEAN,
-        field: 'is_read',
+        field: 'isRead',
         defaultValue: false
       },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
+        field: 'createdAt'
       },
       updatedAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
+        field: 'updatedAt'
       }
     },
     {
       sequelize,
       tableName: 'messages',
       timestamps: true,
-      underscored: true
+      underscored: false, // 与User模型保持一致，不使用下划线命名策略
+      createdAt: 'createdAt', // 明确指定字段名
+      updatedAt: 'updatedAt'  // 明确指定字段名
     }
   )
 

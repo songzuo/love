@@ -67,6 +67,34 @@ export const updateUserProfile = async (req: any, res: Response) => {
   }
 }
 
+// @desc    Get all users for browsing
+// @route   GET /api/users
+// @access  Private
+export const getUsers = async (req: any, res: Response) => {
+  try {
+    // 获取User模型
+    const User = (global as any).User;
+    
+    const users = await User.findAll({ where: { id: { [Op.ne]: req.user.id } } })
+    // 确保返回纯JavaScript对象而不是Sequelize实例
+    const plainUsers = users.map((user: any) => user.toJSON ? user.toJSON() : user)
+    
+    // 返回明确的数据结构
+    res.status(200).json({
+      success: true,
+      users: plainUsers,
+      count: plainUsers.length
+    })
+  } catch (error) {
+    console.error('Error in getUsers:', error)
+    res.status(500).json({ 
+      success: false,
+      message: '获取用户列表失败',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    })
+  }
+}
+
 // @desc    Get all users (admin only)
 // @route   GET /api/admin/users
 // @access  Private/Admin
