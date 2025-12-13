@@ -40,6 +40,7 @@ const MessageModel = (sequelize: Sequelize) => {
       senderId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: 'sender_id',
         references: {
           model: 'users',
           key: 'id'
@@ -50,6 +51,7 @@ const MessageModel = (sequelize: Sequelize) => {
       recipientId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: 'recipient_id',
         references: {
           model: 'users',
           key: 'id'
@@ -68,6 +70,7 @@ const MessageModel = (sequelize: Sequelize) => {
       },
       isRead: {
         type: DataTypes.BOOLEAN,
+        field: 'is_read',
         defaultValue: false
       },
       createdAt: {
@@ -84,7 +87,8 @@ const MessageModel = (sequelize: Sequelize) => {
     {
       sequelize,
       tableName: 'messages',
-      timestamps: true
+      timestamps: true,
+      underscored: true
     }
   )
 
