@@ -95,20 +95,22 @@ const UserModel = (sequelize: Sequelize) => {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW,
-        field: 'created_at' // 明确指定数据库列名
+        field: 'createdAt' // 明确指定数据库列名
       },
       updatedAt: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW,
-        field: 'updated_at' // 明确指定数据库列名
+        field: 'updatedAt' // 明确指定数据库列名
       }
     },
     {
       sequelize,
       tableName: 'users',
       timestamps: true,
-      underscored: true // 使用下划线命名策略
+      underscored: false, // 不使用下划线命名策略，使用驼峰命名法
+      createdAt: 'createdAt', // 明确指定字段名
+      updatedAt: 'updatedAt'  // 明确指定字段名
     }
   )
 

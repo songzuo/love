@@ -69,53 +69,97 @@ const setupApp = () => {
     // Always serve static files regardless of NODE_ENV for testing
     // In production, this will serve the built client
     // In development, this will serve the client build if it exists
-    let staticPath = path.join(__dirname, process.env.NODE_ENV === 'production' ? '../../../client/dist' : '../../client/dist');
-    console.log('Static files path:', staticPath);
     
-    // Check if the directory exists
-    if (fs.existsSync(staticPath)) {
-        console.log('Static directory exists');
-        console.log('Files in static directory:', fs.readdirSync(staticPath));
-    } else {
-        console.error('Static directory does not exist:', staticPath);
-        // Try an alternative path that might work in production
-        const altStaticPath = path.join(process.cwd(), 'client/dist');
-        console.log('Trying alternative static path:', altStaticPath);
-        if (fs.existsSync(altStaticPath)) {
-            console.log('Alternative static directory exists');
-            console.log('Files in alternative static directory:', fs.readdirSync(altStaticPath));
-            // Use the alternative path if it exists
-            staticPath = altStaticPath;
+    // Log current working directory and __dirname for debugging
+    console.log('Current working directory:', process.cwd());
+    console.log('__dirname:', __dirname);
+    console.log('NODE_ENV:', process.env.NODE_ENV);
+    
+    // Try multiple possible static paths
+    const possibleStaticPaths = [
+        // Default path based on __dirname
+        path.join(__dirname, process.env.NODE_ENV === 'production' ? '../../../client/dist' : '../../client/dist'),
+        // Alternative path based on cwd
+        path.join(process.cwd(), 'client/dist'),
+        // Render specific path
+        path.join(process.cwd(), '../../client/dist'),
+        // Another Render specific path (assuming src directory structure)
+        path.join(process.cwd(), '../client/dist'),
+        // Absolute path for Render
+        '/opt/render/project/src/client/dist'
+    ];
+    
+    let staticPath = '';
+    let foundStaticPath = false;
+    
+    for (const possiblePath of possibleStaticPaths) {
+        console.log('Checking static path:', possiblePath);
+        if (fs.existsSync(possiblePath)) {
+            console.log('✓ Found static directory:', possiblePath);
+            try {
+                const files = fs.readdirSync(possiblePath);
+                console.log('Files in static directory:', files);
+                staticPath = possiblePath;
+                foundStaticPath = true;
+                break;
+            } catch (readError) {
+                console.error('Error reading directory:', readError);
+            }
+        } else {
+            console.log('✗ Static directory does not exist:', possiblePath);
         }
     }
     
-    // Serve static files with proper MIME types
-    app.use(express.static(staticPath, {
-        setHeaders: (res, filePath) => {
-            // Set correct MIME types for JavaScript and WASM files
-            if (filePath.endsWith('.js') || filePath.endsWith('.mjs')) {
-                res.setHeader('Content-Type', 'application/javascript');
-            } else if (filePath.endsWith('.wasm')) {
-                res.setHeader('Content-Type', 'application/wasm');
+    // If no static path found, log more debug info
+    if (!foundStaticPath) {
+        console.error('❌ No static directory found in any of the possible paths');
+        // Log directory structure for debugging
+        try {
+            console.log('Directory structure from cwd:', fs.readdirSync(process.cwd()));
+            if (fs.existsSync(path.join(process.cwd(), '..'))) {
+                console.log('Directory structure from parent:', fs.readdirSync(path.join(process.cwd(), '..')));
             }
+        } catch (dirError) {
+            console.error('Error reading directory structure:', dirError);
         }
-    }));
+    }
     
-    // Serve index.html for all non-API routes (for SPA)
-    // 注意：这个路由必须放在所有API路由之后
-    app.get(/^\/(?!api\/).*/, (req, res) => {
-        const indexPath = path.join(staticPath, 'index.html');
-        console.log('Serving index.html for route:', req.url);
-        console.log('Index file path:', indexPath);
+    // Only serve static files if we found a valid static path
+    if (foundStaticPath && staticPath) {
+        // Serve static files with proper MIME types
+        app.use(express.static(staticPath, {
+            setHeaders: (res, filePath) => {
+                // Set correct MIME types for JavaScript and WASM files
+                if (filePath.endsWith('.js') || filePath.endsWith('.mjs')) {
+                    res.setHeader('Content-Type', 'application/javascript');
+                } else if (filePath.endsWith('.wasm')) {
+                    res.setHeader('Content-Type', 'application/wasm');
+                }
+            }
+        }));
         
-        // Check if file exists before sending
-        if (fs.existsSync(indexPath)) {
-            res.sendFile(indexPath);
-        } else {
-            console.error('Index file not found:', indexPath);
-            res.status(404).json({ message: 'Frontend build not found' });
-        }
-    });
+        // Serve index.html for all non-API routes (for SPA)
+        // 注意：这个路由必须放在所有API路由之后
+        app.get(/^\/(?!api\/).*/, (req, res) => {
+            const indexPath = path.join(staticPath, 'index.html');
+            console.log('Serving index.html for route:', req.url);
+            console.log('Index file path:', indexPath);
+            
+            // Check if file exists before sending
+            if (fs.existsSync(indexPath)) {
+                res.sendFile(indexPath);
+            } else {
+                console.error('Index file not found:', indexPath);
+                res.status(404).json({ message: 'Frontend build not found' });
+            }
+        });
+    } else {
+        console.warn('⚠️  No valid static path found. Static file serving disabled.');
+        // Still provide a fallback for non-API routes
+        app.get(/^\/(?!api\/).*/, (req, res) => {
+            res.status(404).json({ message: 'Frontend build not found. Server running in API-only mode.' });
+        });
+    }
 
   // Error handling middleware
   app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
