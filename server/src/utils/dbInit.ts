@@ -11,6 +11,20 @@ const initializeDatabase = async () => {
       return;
     }
     
+    // 检查当前表结构
+    try {
+      const queryInterface = (global as any).sequelize.getQueryInterface();
+      const tables = await queryInterface.showAllTables();
+      console.log('Existing tables:', tables);
+      
+      if (tables.includes('users')) {
+        const tableDesc = await queryInterface.describeTable('users');
+        console.log('Current users table structure:', tableDesc);
+      }
+    } catch (tableError) {
+      console.log('Could not check table structure:', tableError);
+    }
+    
     // 管理员账户信息
     const adminUsers = [
       { email: 'bigasong5@gmail.com', username: 'bigasong5', password: 'admin123' },
@@ -21,8 +35,10 @@ const initializeDatabase = async () => {
     // 创建或更新管理员用户
     for (const adminInfo of adminUsers) {
       try {
+        console.log(`Processing admin user: ${adminInfo.email}`);
         const existingAdmin = await User.findOne({ where: { email: adminInfo.email } });
         if (!existingAdmin) {
+          console.log(`Creating new admin user: ${adminInfo.email}`);
           const salt = await bcrypt.genSalt(10);
           const hashedPassword = await bcrypt.hash(adminInfo.password, salt);
           
