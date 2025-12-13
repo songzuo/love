@@ -45,7 +45,7 @@ const SendMessageModal = ({ recipientId, recipientName, onClose, onSuccess }: Se
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content" onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
         <div className="modal-header">
           <h3>发送消息给 {recipientName}</h3>
           <button className="modal-close" onClick={onClose}>&times;</button>
@@ -59,7 +59,7 @@ const SendMessageModal = ({ recipientId, recipientName, onClose, onSuccess }: Se
             <textarea
               id="message-content"
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
               placeholder="输入你想说的话..."
               rows={5}
               maxLength={500}

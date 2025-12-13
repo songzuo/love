@@ -114,15 +114,15 @@ const AdminUsers = () => {
           type="text"
           placeholder="搜索用户名或邮箱..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
           className="search-input"
         />
-        <select value={filterRole} onChange={(e) => setFilterRole(e.target.value)} className="filter-select">
+        <select value={filterRole} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterRole(e.target.value)} className="filter-select">
           <option value="all">全部角色</option>
           <option value="user">普通用户</option>
           <option value="admin">管理员</option>
         </select>
-        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="filter-select">
+        <select value={filterStatus} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterStatus(e.target.value)} className="filter-select">
           <option value="all">全部状态</option>
           <option value="active">活跃</option>
           <option value="inactive">禁用</option>
@@ -154,7 +154,7 @@ const AdminUsers = () => {
               <td>
                 <select 
                   value={user.role} 
-                  onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleRoleChange(user.id, e.target.value)}
                   className="role-select"
                 >
                   <option value="user">普通用户</option>

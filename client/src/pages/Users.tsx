@@ -79,7 +79,7 @@ const Users = () => {
           type="text"
           placeholder="搜索用户名或邮箱..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
           style={{
             width: '100%',
             padding: '0.75rem',
