@@ -144,6 +144,11 @@ declare namespace React {
     readonly props: Readonly<P> & Readonly<{ children?: ReactNode }>;
     state: Readonly<S>;
   }
+  
+  // Additional React namespace exports
+  const Fragment: any;
+  const StrictMode: any;
+  const Suspense: any;
 }
 
 // JSX namespace
