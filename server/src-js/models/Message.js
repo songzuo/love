@@ -1,69 +1,65 @@
-const { Model, DataTypes } = require('sequelize');
-
-class Message extends Model {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const sequelize_1 = require("sequelize");
+class Message extends sequelize_1.Model {
 }
-
 const MessageModel = (sequelize) => {
-  Message.init(
-    {
-      id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-        allowNull: false
-      },
-      senderId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'users',
-          key: 'id'
+    Message.init({
+        id: {
+            type: sequelize_1.DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+            allowNull: false
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
-      },
-      recipientId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'users',
-          key: 'id'
+        senderId: {
+            type: sequelize_1.DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: 'users',
+                key: 'id'
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE'
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
-      },
-      content: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-        validate: {
-          notEmpty: {
-            msg: 'Message content is required'
-          }
+        recipientId: {
+            type: sequelize_1.DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: 'users',
+                key: 'id'
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE'
+        },
+        content: {
+            type: sequelize_1.DataTypes.TEXT,
+            allowNull: false,
+            validate: {
+                notEmpty: {
+                    msg: 'Message content is required'
+                }
+            }
+        },
+        isRead: {
+            type: sequelize_1.DataTypes.BOOLEAN,
+            defaultValue: false
+        },
+        createdAt: {
+            type: sequelize_1.DataTypes.DATE,
+            allowNull: false,
+            defaultValue: sequelize_1.DataTypes.NOW
+        },
+        updatedAt: {
+            type: sequelize_1.DataTypes.DATE,
+            allowNull: false,
+            defaultValue: sequelize_1.DataTypes.NOW
         }
-      },
-      isRead: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
-      },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW
-      },
-      updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW
-      }
-    },
-    {
-      sequelize,
-      tableName: 'messages',
-      timestamps: true
-    }
-  );
-
-  return Message;
+    }, {
+        sequelize,
+        tableName: 'messages',
+        timestamps: true
+    });
+    return Message;
 };
-
-module.exports = MessageModel;
+exports.default = MessageModel;
+//# sourceMappingURL=Message.js.map
