@@ -28,15 +28,19 @@ connectDB()
   .then(async () => {
     console.log('Database connected successfully');
     
-    // Initialize database with admin users
+    // Initialize models and relationships AFTER database connection
+    const { User, Message } = createModels(sequelize) as { User: any, Message: any }
+    
+    // Make models globally available
+    (global as any).User = User;
+    (global as any).Message = Message;
+    
+    // Initialize database with admin users AFTER models are created
     await initializeDatabase();
   })
   .catch((error) => {
     console.error('Failed to connect to database:', error);
   });
-
-// Initialize models and relationships
-const { User, Message } = createModels(sequelize) as { User: any, Message: any }
 
 // Middleware
 app.use(cors())
@@ -145,4 +149,6 @@ app.listen(PORT, () => {
 })
 
 // Export models for use in other files
-export { User, Message }
+// We'll export them from the global scope since they're initialized asynchronously
+export const User = () => (global as any).User;
+export const Message = () => (global as any).Message;

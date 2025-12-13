@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { User } from '../index'
 import { Op } from 'sequelize'
 import { generateToken } from '../utils/jwt'
 
@@ -22,6 +21,9 @@ export const register = async (req: Request, res: Response) => {
     const { username, email, password }: RegisterRequest = req.body
 
     console.log('Register request received:', { username, email, password: password ? '***' : 'empty' });
+    
+    // 获取User模型
+    const User = (global as any).User;
 
     // Check if user already exists
     const existingUser = await User.findOne({
@@ -87,6 +89,9 @@ export const login = async (req: Request, res: Response) => {
     const { email, password }: LoginRequest = req.body
 
     console.log('Login request received:', { email, password: password ? '***' : 'empty' });
+    
+    // 获取User模型
+    const User = (global as any).User;
 
     // Check if user exists
     const user = await User.findOne({

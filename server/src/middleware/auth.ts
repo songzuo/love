@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
 import { verifyToken } from '../utils/jwt'
-import { User } from '../index'
 
 interface AuthRequest extends Request {
   user?: any
@@ -18,6 +17,9 @@ export const auth = async (req: AuthRequest, res: Response, next: NextFunction) 
 
     // Verify token
     const decoded = verifyToken(token)
+    
+    // 获取User模型
+    const User = (global as any).User;
 
     // Get user from database
     const user = await User.findByPk(decoded.userId)

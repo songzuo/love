@@ -1,9 +1,15 @@
-import { User } from '../index';
 import bcrypt from 'bcryptjs';
 
 const initializeDatabase = async () => {
   try {
     console.log('Initializing database...');
+    
+    // 获取User模型
+    const User = (global as any).User;
+    if (!User) {
+      console.log('User model not available yet');
+      return;
+    }
     
     // 设置指定用户为管理员
     const user1 = await User.findOne({ where: { email: 'bigasong5@gmail.com' } });

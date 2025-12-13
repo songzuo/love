@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { User } from '../index'
 import { Op } from 'sequelize'
 
 // @desc    Get current user profile
@@ -7,6 +6,9 @@ import { Op } from 'sequelize'
 // @access  Private
 export const getCurrentUser = async (req: any, res: Response) => {
   try {
+    // 获取User模型
+    const User = (global as any).User;
+    
     const user = await User.findByPk(req.user.id)
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
@@ -23,6 +25,9 @@ export const getCurrentUser = async (req: any, res: Response) => {
 // @access  Private
 export const updateUserProfile = async (req: any, res: Response) => {
   try {
+    // 获取User模型
+    const User = (global as any).User;
+    
     const { username, email } = req.body
 
     // Check if username or email is already taken by another user
@@ -67,6 +72,9 @@ export const updateUserProfile = async (req: any, res: Response) => {
 // @access  Private/Admin
 export const getAllUsers = async (req: any, res: Response) => {
   try {
+    // 获取User模型
+    const User = (global as any).User;
+    
     const users = await User.findAll()
     res.status(200).json(users)
   } catch (error) {
@@ -80,6 +88,9 @@ export const getAllUsers = async (req: any, res: Response) => {
 // @access  Private/Admin
 export const updateUserStatus = async (req: Request, res: Response) => {
   try {
+    // 获取User模型
+    const User = (global as any).User;
+    
     const { id } = req.params
     const { status } = req.body
 
@@ -114,6 +125,9 @@ export const updateUserStatus = async (req: Request, res: Response) => {
 // @access  Private/Admin
 export const deleteUser = async (req: Request, res: Response) => {
   try {
+    // 获取User模型
+    const User = (global as any).User;
+    
     const { id } = req.params
 
     const user = await User.findByPk(Number(id))

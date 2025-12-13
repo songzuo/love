@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { Message, User } from '../index'
 import { Op } from 'sequelize'
 
 interface SendMessageRequest {
@@ -12,6 +11,10 @@ interface SendMessageRequest {
 // @access  Private
 export const sendMessage = async (req: any, res: Response) => {
   try {
+    // 获取模型
+    const User = (global as any).User;
+    const Message = (global as any).Message;
+    
     const { recipientId, content }: SendMessageRequest = req.body
     const senderId = req.user._id
 
@@ -56,6 +59,10 @@ export const sendMessage = async (req: any, res: Response) => {
 // @access  Private
 export const getMessages = async (req: any, res: Response) => {
   try {
+    // 获取模型
+    const User = (global as any).User;
+    const Message = (global as any).Message;
+    
     const userId = req.user._id
 
     // Get all messages where user is sender or recipient
@@ -88,6 +95,10 @@ export const getMessages = async (req: any, res: Response) => {
 // @access  Private
 export const getConversation = async (req: any, res: Response) => {
   try {
+    // 获取模型
+    const User = (global as any).User;
+    const Message = (global as any).Message;
+    
     const currentUserId = req.user._id
     const otherUserId = Number(req.params.userId)
 
@@ -139,6 +150,10 @@ export const getConversation = async (req: any, res: Response) => {
 // @access  Private
 export const markAsRead = async (req: any, res: Response) => {
   try {
+    // 获取模型
+    const User = (global as any).User;
+    const Message = (global as any).Message;
+    
     const messageId = Number(req.params.messageId)
     const userId = req.user._id
 
@@ -173,6 +188,10 @@ export const markAsRead = async (req: any, res: Response) => {
 // @access  Private
 export const deleteMessage = async (req: any, res: Response) => {
   try {
+    // 获取模型
+    const User = (global as any).User;
+    const Message = (global as any).Message;
+    
     const messageId = Number(req.params.messageId)
     const userId = req.user._id
 
