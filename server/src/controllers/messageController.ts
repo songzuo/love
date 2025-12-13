@@ -16,7 +16,7 @@ export const sendMessage = async (req: any, res: Response) => {
     const Message = (global as any).Message;
     
     const { recipientId, content }: SendMessageRequest = req.body
-    const senderId = req.user._id
+    const senderId = req.user.id
 
     // Check if recipient exists
     const recipient = await User.findByPk(recipientId)
@@ -63,7 +63,7 @@ export const getMessages = async (req: any, res: Response) => {
     const User = (global as any).User;
     const Message = (global as any).Message;
     
-    const userId = req.user._id
+    const userId = req.user.id
 
     // Get all messages where user is sender or recipient
     const messages = await Message.findAll({
@@ -99,7 +99,7 @@ export const getConversation = async (req: any, res: Response) => {
     const User = (global as any).User;
     const Message = (global as any).Message;
     
-    const currentUserId = req.user._id
+    const currentUserId = req.user.id
     const otherUserId = Number(req.params.userId)
 
     // Check if other user exists
@@ -155,7 +155,7 @@ export const markAsRead = async (req: any, res: Response) => {
     const Message = (global as any).Message;
     
     const messageId = Number(req.params.messageId)
-    const userId = req.user._id
+    const userId = req.user.id
 
     // Check if message exists and belongs to the user
     const message = await Message.findOne({
@@ -193,7 +193,7 @@ export const deleteMessage = async (req: any, res: Response) => {
     const Message = (global as any).Message;
     
     const messageId = Number(req.params.messageId)
-    const userId = req.user._id
+    const userId = req.user.id
 
     // Check if message exists and belongs to the user (sender or recipient)
     const message = await Message.findOne({

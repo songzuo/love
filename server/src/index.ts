@@ -8,6 +8,8 @@ import userRoutes from './routes/users'
 import adminRoutes from './routes/admin'
 import messageRoutes from './routes/messages'
 import publicAdminRoutes from './routes/publicAdmin'
+import matchesRoutes from './routes/matches'
+import favoritesRoutes from './routes/favorites'
 import path from 'path'
 import fs from 'fs'
 import initializeDatabase from './utils/dbInit'
@@ -59,6 +61,8 @@ const setupApp = () => {
   app.use('/api/admin', adminRoutes)
   app.use('/api/messages', messageRoutes)
   app.use('/api/public-admin', publicAdminRoutes)
+  app.use('/api/matches', matchesRoutes)
+  app.use('/api/favorites', favoritesRoutes)
 
   // Health check route
   app.get('/api/health', (req, res) => {
