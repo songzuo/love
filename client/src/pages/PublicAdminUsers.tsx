@@ -24,25 +24,47 @@ const PublicAdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
+      setLoading(true)
+      console.log('Fetching users from API...')
       const response = await axios.get('/api/public-admin/users')
-      console.log('API Response:', response.data); // 调试信息
+      console.log('Raw API Response:', response)
+      console.log('Response data type:', typeof response.data)
+      console.log('Response data:', response.data)
+      
+      // 检查响应是否为字符串（可能是HTML错误页面）
+      if (typeof response.data === 'string') {
+        console.error('Received string response instead of JSON:', response.data.substring(0, 200))
+        setError('服务器返回了意外的响应格式，请检查服务器状态')
+        return
+      }
       
       // 确保响应数据是数组格式
       if (response.data && response.data.success && Array.isArray(response.data.users)) {
+        console.log('Setting users from response.data.users')
         setUsers(response.data.users)
       } else if (response.data && typeof response.data === 'object' && response.data.users && Array.isArray(response.data.users)) {
         // 如果数据嵌套在users属性中
+        console.log('Setting users from response.data.users (alternative format)')
         setUsers(response.data.users)
       } else if (Array.isArray(response.data)) {
         // 兼容旧格式
+        console.log('Setting users from response.data (direct array)')
         setUsers(response.data)
       } else {
         console.error('Unexpected data format:', response.data)
         setError('数据格式错误: 期望包含users数组的对象，但收到 ' + typeof response.data)
       }
     } catch (err: any) {
-      console.error('API Error:', err); // 调试信息
-      setError(err.response?.data?.message || err.message || '获取用户列表失败')
+      console.error('API Error:', err)
+      if (err.response) {
+        console.error('Error response:', err.response)
+        setError(`服务器错误 (${err.response.status}): ${err.response.data?.message || '未知错误'}`)
+      } else if (err.request) {
+        console.error('Error request:', err.request)
+        setError('网络错误: 无法连接到服务器')
+      } else {
+        setError(`请求错误: ${err.message}`)
+      }
     } finally {
       setLoading(false)
     }
@@ -64,7 +86,13 @@ const PublicAdminUsers = () => {
         throw new Error('响应数据格式不正确')
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || err.message || '提升用户失败')
+      if (err.response) {
+        alert(`服务器错误 (${err.response.status}): ${err.response.data?.message || '未知错误'}`)
+      } else if (err.request) {
+        alert('网络错误: 无法连接到服务器')
+      } else {
+        alert(`请求错误: ${err.message || '提升用户失败'}`)
+      }
     }
   }
 
@@ -84,7 +112,13 @@ const PublicAdminUsers = () => {
         throw new Error('响应数据格式不正确')
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || err.message || '降级用户失败')
+      if (err.response) {
+        alert(`服务器错误 (${err.response.status}): ${err.response.data?.message || '未知错误'}`)
+      } else if (err.request) {
+        alert('网络错误: 无法连接到服务器')
+      } else {
+        alert(`请求错误: ${err.message || '降级用户失败'}`)
+      }
     }
   }
 
