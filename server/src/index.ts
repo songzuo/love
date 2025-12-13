@@ -32,11 +32,12 @@ connectDB()
     console.log('Database connected successfully');
     
     // Initialize models and relationships AFTER database connection
-    const { User, Message } = createModels(sequelize) as { User: any, Message: any }
+    const { User, Message, Favorite } = createModels(sequelize) as { User: any, Message: any, Favorite: any }
     
     // Make models globally available
     (global as any).User = User;
     (global as any).Message = Message;
+    (global as any).Favorite = Favorite;
     
     // Initialize database with admin users AFTER models are created
     await initializeDatabase();

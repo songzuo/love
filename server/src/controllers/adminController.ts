@@ -156,3 +156,109 @@ export const demoteToUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error' })
   }
 }
+
+// @desc    Get basic admin statistics
+// @route   GET /api/admin/statistics
+// @access  Private/Admin
+export const getStatistics = async (req: Request, res: Response) => {
+  try {
+    // 获取User模型
+    const User = (global as any).User;
+    
+    // 计算日期范围
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const weekAgo = new Date(today);
+    weekAgo.setDate(today.getDate() - 7);
+    
+    // 查询各种统计数据
+    const totalUsers = await User.count();
+    const activeUsers = await User.count({ where: { status: 'active' } });
+    const inactiveUsers = await User.count({ where: { status: 'inactive' } });
+    const adminUsers = await User.count({ where: { role: 'admin' } });
+    const newUsersToday = await User.count({ where: { createdAt: { [Op.gte]: today } } });
+    const newUsersThisWeek = await User.count({ where: { createdAt: { [Op.gte]: weekAgo } } });
+    
+    res.status(200).json({
+      totalUsers,
+      activeUsers,
+      inactiveUsers,
+      adminUsers,
+      newUsersToday,
+      newUsersThisWeek
+    });
+  } catch (error) {
+    console.error('Error in getStatistics:', error);
+    res.status(500).json({ message: '获取统计数据失败' });
+  }
+}
+
+// @desc    Get detailed admin statistics
+// @route   GET /api/admin/statistics/detailed
+// @access  Private/Admin
+export const getDetailedStatistics = async (req: Request, res: Response) => {
+  try {
+    // 获取User模型
+    const User = (global as any).User;
+    
+    // 计算日期范围
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const weekAgo = new Date(today);
+    weekAgo.setDate(today.getDate() - 7);
+    
+    const monthAgo = new Date(today);
+    monthAgo.setMonth(today.getMonth() - 1);
+    
+    // 查询基本统计数据
+    const totalUsers = await User.count();
+    const activeUsers = await User.count({ where: { status: 'active' } });
+    const inactiveUsers = await User.count({ where: { status: 'inactive' } });
+    const adminUsers = await User.count({ where: { role: 'admin' } });
+    const regularUsers = await User.count({ where: { role: 'user' } });
+    const newUsersToday = await User.count({ where: { createdAt: { [Op.gte]: today } } });
+    const newUsersThisWeek = await User.count({ where: { createdAt: { [Op.gte]: weekAgo } } });
+    const newUsersThisMonth = await User.count({ where: { createdAt: { [Op.gte]: monthAgo } } });
+    
+    // 查询用户增长趋势数据（过去7天）
+    const userGrowth = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      
+      const nextDate = new Date(date);
+      nextDate.setDate(date.getDate() + 1);
+      
+      const count = await User.count({ 
+        where: { 
+          createdAt: { 
+            [Op.gte]: date, 
+            [Op.lt]: nextDate 
+          } 
+        } 
+      });
+      
+      userGrowth.push({
+        date: date.toISOString().split('T')[0],
+        count
+      });
+    }
+    
+    res.status(200).json({
+      totalUsers,
+      activeUsers,
+      inactiveUsers,
+      adminUsers,
+      regularUsers,
+      newUsersToday,
+      newUsersThisWeek,
+      newUsersThisMonth,
+      userGrowth
+    });
+  } catch (error) {
+    console.error('Error in getDetailedStatistics:', error);
+    res.status(500).json({ message: '获取统计数据失败' });
+  }
+}
