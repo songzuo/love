@@ -76,7 +76,8 @@ export const getAllUsers = async (req: any, res: Response) => {
     const User = (global as any).User;
     
     const users = await User.findAll()
-    res.status(200).json(users)
+    // 确保返回纯JavaScript对象而不是Sequelize实例
+    res.status(200).json(users.map((user: any) => user.toJSON ? user.toJSON() : user))
   } catch (error) {
     console.error('Error in getAllUsers:', error)
     res.status(500).json({ message: 'Server error' })

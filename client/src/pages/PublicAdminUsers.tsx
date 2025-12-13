@@ -25,7 +25,14 @@ const PublicAdminUsers = () => {
   const fetchUsers = async () => {
     try {
       const response = await axios.get('/api/public-admin/users')
-      setUsers(response.data)
+      
+      // 确保响应数据是数组格式
+      if (Array.isArray(response.data)) {
+        setUsers(response.data)
+      } else {
+        console.error('Unexpected data format:', response.data)
+        setError('数据格式错误')
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || '获取用户列表失败')
     } finally {
