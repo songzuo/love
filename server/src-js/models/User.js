@@ -78,20 +78,24 @@ const UserModel = (sequelize) => {
             allowNull: false,
             defaultValue: 'active'
         },
+        // 明确声明时间戳字段以匹配数据库列名
         createdAt: {
             type: sequelize_1.DataTypes.DATE,
             allowNull: false,
-            defaultValue: sequelize_1.DataTypes.NOW
+            defaultValue: sequelize_1.DataTypes.NOW,
+            field: 'created_at' // 明确指定数据库列名
         },
         updatedAt: {
             type: sequelize_1.DataTypes.DATE,
             allowNull: false,
-            defaultValue: sequelize_1.DataTypes.NOW
+            defaultValue: sequelize_1.DataTypes.NOW,
+            field: 'updated_at' // 明确指定数据库列名
         }
     }, {
         sequelize,
         tableName: 'users',
-        timestamps: true
+        timestamps: true,
+        underscored: true // 使用下划线命名策略
     });
     // 在创建或更新用户之前加密密码
     User.addHook('beforeSave', async (user) => {
