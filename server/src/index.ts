@@ -95,6 +95,20 @@ if (process.env.NODE_ENV === 'production') {
       }
     }
   }));
+  
+  // Serve index.html for all non-API routes (for SPA)
+  app.get(/^\/(?!api).*$/, (req, res) => {
+    const indexPath = path.join(__dirname, '../../client/dist/index.html');
+    console.log('Serving index.html for route:', req.url);
+    
+    // Check if file exists before sending
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      console.error('Index file not found:', indexPath);
+      res.status(404).json({ message: 'Frontend build not found' });
+    }
+  });
 }
 
 // Routes
