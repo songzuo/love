@@ -6,7 +6,10 @@ import { Op } from 'sequelize'
 // @access  Public (for testing purposes only)
 export const getAllUsers = async (req: any, res: Response) => {
   try {
-    console.log('getAllUsers called');
+    console.log('=== Public Admin getAllUsers called ===');
+    console.log('Request URL:', req.originalUrl);
+    console.log('Request Method:', req.method);
+    console.log('Request Headers:', req.headers);
     
     // 检查User模型是否可用
     const User = (global as any).User;
