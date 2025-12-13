@@ -2,7 +2,7 @@
   "name": "dating-app-server",
   "version": "1.0.0",
   "description": "婚恋交友网站后端API",
-  "main": "dist/index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "dev": "tsc-watch --onSuccess \"node dist/index.js\"",
     "build": "tsc",

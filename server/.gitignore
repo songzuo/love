@@ -1,5 +1,5 @@
 # Compiled output
-dist/
+# dist/ - Removed from ignore list so compiled files are included in deployment
 
 # Dependencies
 node_modules/
