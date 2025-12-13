@@ -73,15 +73,19 @@ const setupApp = () => {
     // Check if the directory exists
     if (fs.existsSync(staticPath)) {
       console.log('Static directory exists');
+      console.log('Files in static directory:', fs.readdirSync(staticPath));
     } else {
       console.error('Static directory does not exist:', staticPath);
     }
     
     // Serve static files with proper MIME types
     app.use(express.static(staticPath, {
-      setHeaders: (res, path) => {
-        if (path.endsWith('.js')) {
+      setHeaders: (res, filePath) => {
+        // Set correct MIME types for JavaScript and WASM files
+        if (filePath.endsWith('.js') || filePath.endsWith('.mjs')) {
           res.setHeader('Content-Type', 'application/javascript');
+        } else if (filePath.endsWith('.wasm')) {
+          res.setHeader('Content-Type', 'application/wasm');
         }
       }
     }));
