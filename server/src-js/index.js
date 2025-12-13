@@ -46,6 +46,42 @@ app.use(express.urlencoded({ extended: true }));
 if (process.env.NODE_ENV === 'production') {
   const staticPath = path.join(__dirname, '../../client/dist');
   console.log('Static files path:', staticPath);
+  
+  // Check if the directory exists
+  const fs = require('fs');
+  if (fs.existsSync(staticPath)) {
+    console.log('Static directory exists');
+    // List files in the directory for debugging
+    try {
+      const files = fs.readdirSync(staticPath);
+      console.log('Files in static directory:', files);
+    } catch (err) {
+      console.error('Error reading static directory:', err);
+    }
+  } else {
+    console.error('Static directory does not exist:', staticPath);
+    // Try to show the parent directory structure
+    const parentDir = path.join(__dirname, '../../client');
+    if (fs.existsSync(parentDir)) {
+      try {
+        const files = fs.readdirSync(parentDir);
+        console.log('Files in client directory:', files);
+      } catch (err) {
+        console.error('Error reading client directory:', err);
+      }
+    } else {
+      console.error('Client directory does not exist:', parentDir);
+      // Show root structure
+      const rootDir = path.join(__dirname, '../../');
+      try {
+        const files = fs.readdirSync(rootDir);
+        console.log('Files in root directory:', files);
+      } catch (err) {
+        console.error('Error reading root directory:', err);
+      }
+    }
+  }
+  
   app.use(express.static(staticPath));
 }
 
