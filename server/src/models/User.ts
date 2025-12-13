@@ -90,21 +90,25 @@ const UserModel = (sequelize: Sequelize) => {
         allowNull: false,
         defaultValue: 'active'
       },
+      // 明确声明时间戳字段以匹配数据库列名
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
+        field: 'created_at' // 明确指定数据库列名
       },
       updatedAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
+        field: 'updated_at' // 明确指定数据库列名
       }
     },
     {
       sequelize,
       tableName: 'users',
-      timestamps: true
+      timestamps: true,
+      underscored: true // 使用下划线命名策略
     }
   )
 
