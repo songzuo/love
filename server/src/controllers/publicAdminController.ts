@@ -44,12 +44,20 @@ export const getAllUsers = async (req: any, res: Response) => {
     res.status(200).json(response);
   } catch (error: any) {
     console.error('Error in getAllUsers:', error);
-    res.status(500).json({ 
+    
+    // 确保始终返回JSON格式的响应
+    const errorResponse = {
       success: false,
-      message: 'Server error',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    });
+      message: 'Server error occurred while fetching users',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+    
+    // 在开发环境中包含堆栈跟踪
+    if (process.env.NODE_ENV === 'development') {
+      (errorResponse as any).stack = error.stack;
+    }
+    
+    res.status(500).json(errorResponse);
   }
 }
 

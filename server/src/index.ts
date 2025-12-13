@@ -48,6 +48,18 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+// Routes
+app.use('/api/auth', authRoutes)
+app.use('/api/users', userRoutes)
+app.use('/api/admin', adminRoutes)
+app.use('/api/messages', messageRoutes)
+app.use('/api/public-admin', publicAdminRoutes) // 新增的公共管理路由
+
+// Health check route
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'Dating App API is running' })
+})
+
 // Serve static files from client build directory
 if (process.env.NODE_ENV === 'production') {
   const staticPath = path.join(__dirname, '../../client/dist');
@@ -100,35 +112,6 @@ if (process.env.NODE_ENV === 'production') {
   app.get(/^\/(?!api).*$/, (req, res) => {
     const indexPath = path.join(__dirname, '../../client/dist/index.html');
     console.log('Serving index.html for route:', req.url);
-    
-    // Check if file exists before sending
-    if (fs.existsSync(indexPath)) {
-      res.sendFile(indexPath);
-    } else {
-      console.error('Index file not found:', indexPath);
-      res.status(404).json({ message: 'Frontend build not found' });
-    }
-  });
-}
-
-// Routes
-app.use('/api/auth', authRoutes)
-app.use('/api/users', userRoutes)
-app.use('/api/admin', adminRoutes)
-app.use('/api/messages', messageRoutes)
-app.use('/api/public-admin', publicAdminRoutes) // 新增的公共管理路由
-
-// Health check route
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok', message: 'Dating App API is running' })
-})
-
-// Serve frontend static files in production
-if (process.env.NODE_ENV === 'production') {
-  // Handle React routing, return all requests to React app
-  app.get('*', (req, res) => {
-    const indexPath = path.join(__dirname, '../../client/dist/index.html');
-    console.log('Index file path:', indexPath);
     
     // Check if file exists before sending
     if (fs.existsSync(indexPath)) {

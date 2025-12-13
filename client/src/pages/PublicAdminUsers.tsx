@@ -33,8 +33,8 @@ const PublicAdminUsers = () => {
       
       // 检查响应是否为字符串（可能是HTML错误页面）
       if (typeof response.data === 'string') {
-        console.error('Received string response instead of JSON:', response.data.substring(0, 200))
-        setError('服务器返回了意外的响应格式，请检查服务器状态')
+        console.error('Received string response instead of JSON:', response.data.substring(0, 500))
+        setError(`服务器返回了意外的响应格式，请检查服务器状态。响应内容预览: ${response.data.substring(0, 200)}`)
         return
       }
       
@@ -58,7 +58,12 @@ const PublicAdminUsers = () => {
       console.error('API Error:', err)
       if (err.response) {
         console.error('Error response:', err.response)
-        setError(`服务器错误 (${err.response.status}): ${err.response.data?.message || '未知错误'}`)
+        // 检查错误响应是否为字符串
+        if (typeof err.response.data === 'string') {
+          setError(`服务器错误 (${err.response.status}): 服务器返回了HTML错误页面。请检查服务器日志。`)
+        } else {
+          setError(`服务器错误 (${err.response.status}): ${err.response.data?.message || '未知错误'}`)
+        }
       } else if (err.request) {
         console.error('Error request:', err.request)
         setError('网络错误: 无法连接到服务器')
