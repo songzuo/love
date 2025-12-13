@@ -62,11 +62,21 @@ const connectDB = async () => {
         // 自动同步模型到数据库
         // 在生产环境中使用alter: true来更新表结构而不丢失数据
         // 在开发环境中也可以使用alter: true
+        // 如果表结构不正确，我们可以临时使用force: true来重新创建表（会丢失数据）
         await sequelize.sync({
             alter: true, // 自动更新表结构以匹配模型定义
             force: false // 不要使用force: true，否则会删除所有数据
         });
         console.log('Database synchronized successfully');
+        // 检查表结构是否正确
+        const queryInterface = sequelize.getQueryInterface();
+        const tables = await queryInterface.showAllTables();
+        console.log('Existing tables:', tables);
+        // 如果users表存在，检查其列
+        if (tables.includes('users')) {
+            const tableDesc = await queryInterface.describeTable('users');
+            console.log('Users table structure:', tableDesc);
+        }
     }
     catch (error) {
         console.error('Error connecting to PostgreSQL:', error);
