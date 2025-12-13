@@ -2,7 +2,7 @@ services:
   - type: web
     name: dating-app-api
     env: node
-    buildCommand: npm install && npm run build
+    buildCommand: npm install && npm install --only=dev && npm run build
     startCommand: npm run start
     envVars:
       - key: NODE_ENV
