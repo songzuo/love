@@ -14,6 +14,11 @@ const auth = async (req, res, next) => {
         const decoded = (0, jwt_1.verifyToken)(token);
         // 获取User模型
         const User = global.User;
+        // Check if User model exists
+        if (!User) {
+            console.error('User model not found in auth middleware');
+            return res.status(401).json({ message: 'Token is not valid' });
+        }
         // Get user from database
         const user = await User.findByPk(decoded.userId);
         if (!user) {

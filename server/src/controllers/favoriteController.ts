@@ -6,13 +6,33 @@ import { Op } from 'sequelize'
 // @access  Private
 export const getFavorites = async (req: any, res: Response) => {
   try {
-    console.log('getFavorites called with user:', req.user?.id);
+    console.log('=== getFavorites called ===');
+    console.log('Request headers:', { authorization: req.headers.authorization?.substring(0, 20) + '...' });
+    console.log('User from req:', req.user);
+    
+    // 获取全局对象
+    console.log('Global object keys:', Object.keys(global as any));
+    
     // 获取模型
     const User = (global as any).User;
     const Favorite = (global as any).Favorite;
+    const sequelize = (global as any).sequelize;
     
-    console.log('User model found:', !!User);
-    console.log('Favorite model found:', !!Favorite);
+    console.log('Models status:', {
+      sequelize: !!sequelize,
+      User: !!User,
+      Favorite: !!Favorite
+    });
+    
+    // 检查数据库连接
+    if (sequelize) {
+      try {
+        await sequelize.authenticate();
+        console.log('Database connection is healthy');
+      } catch (dbError) {
+        console.error('Database connection error:', dbError);
+      }
+    }
     
     // 检查用户是否已认证
     if (!req.user || !req.user.id) {
@@ -21,10 +41,15 @@ export const getFavorites = async (req: any, res: Response) => {
     }
     
     const currentUserId = req.user.id;
+    console.log('Current user ID:', currentUserId);
     
     // 检查Favorite模型是否存在
     if (!Favorite) {
-      console.error('Favorite model not found');
+      console.error('Favorite model not found - checking if it exists in sequelize models');
+      // 尝试从sequelize实例中获取模型
+      if (sequelize) {
+        console.log('Available sequelize models:', Object.keys(sequelize.models));
+      }
       return res.status(200).json([]);
     }
     
@@ -34,35 +59,75 @@ export const getFavorites = async (req: any, res: Response) => {
       return res.status(200).json([]);
     }
     
-    // 获取当前用户的所有收藏
-    const favorites = await Favorite.findAll({
-      where: {
-        userId: currentUserId
-      },
-      include: [
-        {
-          model: User,
-          as: 'favoritedUser',
-          attributes: ['id', 'username', 'email', 'role', 'status', 'createdAt']
+    // 尝试获取收藏列表
+    try {
+      console.log('Attempting to find favorites for user:', currentUserId);
+      const favorites = await Favorite.findAll({
+        where: {
+          userId: currentUserId
+        },
+        include: [
+          {
+            model: User,
+            as: 'favoritedUser',
+            attributes: ['id', 'username', 'email', 'role', 'status', 'createdAt']
+          }
+        ],
+        order: [['createdAt', 'DESC']]
+      });
+      
+      console.log('Favorites found:', favorites.length);
+      
+      // 确保返回纯JavaScript对象
+      const plainFavorites = favorites.map((favorite: any) => {
+        const fav = favorite.toJSON ? favorite.toJSON() : favorite;
+        return {
+          ...fav,
+          favoritedUser: fav.favoritedUser || {}
+        };
+      });
+      
+      // 直接返回数组给前端
+      res.status(200).json(plainFavorites);
+    } catch (findError: any) {
+      console.error('Error finding favorites:', findError);
+      console.error('Find error stack:', findError?.stack || 'No stack available');
+      
+      // 如果是表不存在的错误，尝试手动创建表
+      if (findError instanceof Error && findError.message.includes('relation "favorites" does not exist')) {
+        console.log('Attempting to create missing favorites table...');
+        try {
+          await Favorite.sync({ force: false });
+          console.log('Favorites table created successfully');
+          // 再次尝试获取收藏列表
+          const favorites = await Favorite.findAll({
+            where: {
+              userId: currentUserId
+            },
+            include: [
+              {
+                model: User,
+                as: 'favoritedUser',
+                attributes: ['id', 'username', 'email', 'role', 'status', 'createdAt']
+              }
+            ],
+            order: [['createdAt', 'DESC']]
+          });
+          res.status(200).json(favorites.map((f: any) => f.toJSON()));
+        } catch (createError) {
+          console.error('Failed to create favorites table:', createError);
+          res.status(200).json([]);
         }
-      ],
-      order: [['createdAt', 'DESC']]
-    });
-    
-    console.log('Favorites found:', favorites.length);
-    // 确保返回纯JavaScript对象
-    const plainFavorites = favorites.map((favorite: any) => {
-      const fav = favorite.toJSON ? favorite.toJSON() : favorite;
-      return {
-        ...fav,
-        favoritedUser: fav.favoritedUser || {}
-      };
-    });
-    
-    // 直接返回数组给前端
-    res.status(200).json(plainFavorites);
+      } else {
+        res.status(200).json([]);
+      }
+    }
   } catch (error) {
-    console.error('Error in getFavorites:', error);
+    console.error('Unexpected error in getFavorites:', error);
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
     // Return empty array to prevent frontend map/filter errors
     return res.status(200).json([]);
   }

@@ -17,14 +17,27 @@ const initializeDatabase = async () => {
         // 确保所有表都已创建
         const sequelize = global.sequelize;
         if (sequelize) {
-            console.log('Syncing database models...');
+            console.log('Syncing database models with alter: true...');
             try {
-                // 使用sync({ force: false })确保表存在但不会删除现有数据
-                await sequelize.sync({ force: false });
-                console.log('Database models synced successfully');
+                // 使用sync({ alter: true })确保缺失的表被创建，现有表结构被更新
+                await sequelize.sync({
+                    alter: true, // 创建缺失的表并更新现有表结构
+                    force: false // 不删除现有数据
+                });
+                console.log('Database models synced successfully with alter: true');
             }
             catch (syncError) {
                 console.error('Error syncing database models:', syncError);
+                // 如果alter失败，尝试更激进的方式确保表存在
+                console.log('Attempting to create missing tables explicitly...');
+                try {
+                    // 显式初始化Favorite模型表
+                    await Favorite.sync({ force: false });
+                    console.log('Favorite table created/updated successfully');
+                }
+                catch (createError) {
+                    console.error('Error creating Favorite table:', createError);
+                }
             }
         }
         // 检查当前表结构

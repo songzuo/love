@@ -67,7 +67,8 @@ console.log('Connecting to database...');
     console.log('Database connected successfully');
     // Initialize models and relationships AFTER database connection
     const { User, Message, Favorite } = (0, models_1.createModels)(db_1.sequelize);
-    // Make models globally available
+    // Make models and sequelize globally available
+    global.sequelize = db_1.sequelize;
     global.User = User;
     global.Message = Message;
     global.Favorite = Favorite;
