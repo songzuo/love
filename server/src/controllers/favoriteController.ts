@@ -63,11 +63,8 @@ export const getFavorites = async (req: any, res: Response) => {
     res.status(200).json(plainFavorites);
   } catch (error) {
     console.error('Error in getFavorites:', error);
-    res.status(500).json({ 
-      success: false,
-      message: '获取收藏列表失败',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    });
+    // Return empty array to prevent frontend map/filter errors
+    return res.status(200).json([]);
   }
 }
 
