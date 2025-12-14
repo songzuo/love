@@ -95,11 +95,8 @@ export const getMessages = async (req: any, res: Response) => {
     // 确保返回纯JavaScript对象
     const plainMessages = messages.map((message: any) => message.toJSON ? message.toJSON() : message);
 
-    res.status(200).json({
-      success: true,
-      message: 'Messages retrieved successfully',
-      data: plainMessages
-    })
+    // 直接返回数组给前端
+    res.status(200).json(plainMessages);
   } catch (error) {
     console.error('Error in getMessages:', error);
     res.status(500).json({ 

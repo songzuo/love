@@ -45,11 +45,8 @@ const getFavorites = async (req, res) => {
                 favoritedUser: fav.favoritedUser || {}
             };
         });
-        res.status(200).json({
-            success: true,
-            favorites: plainFavorites,
-            count: plainFavorites.length
-        });
+        // 直接返回数组给前端
+        res.status(200).json(plainFavorites);
     }
     catch (error) {
         console.error('Error in getFavorites:', error);

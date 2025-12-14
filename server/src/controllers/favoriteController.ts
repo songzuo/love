@@ -50,11 +50,8 @@ export const getFavorites = async (req: any, res: Response) => {
       };
     });
     
-    res.status(200).json({
-      success: true,
-      favorites: plainFavorites,
-      count: plainFavorites.length
-    });
+    // 直接返回数组给前端
+    res.status(200).json(plainFavorites);
   } catch (error) {
     console.error('Error in getFavorites:', error);
     res.status(500).json({ 

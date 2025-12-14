@@ -79,12 +79,8 @@ export const getUsers = async (req: any, res: Response) => {
     // 确保返回纯JavaScript对象而不是Sequelize实例
     const plainUsers = users.map((user: any) => user.toJSON ? user.toJSON() : user)
     
-    // 返回明确的数据结构
-    res.status(200).json({
-      success: true,
-      users: plainUsers,
-      count: plainUsers.length
-    })
+    // 直接返回数组给前端
+    res.status(200).json(plainUsers)
   } catch (error) {
     console.error('Error in getUsers:', error)
     res.status(500).json({ 

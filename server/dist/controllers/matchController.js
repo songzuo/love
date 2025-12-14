@@ -21,11 +21,8 @@ const getMatches = async (req, res) => {
         });
         // 确保返回纯JavaScript对象
         const plainMatches = matches.map((user) => user.toJSON ? user.toJSON() : user);
-        res.status(200).json({
-            success: true,
-            matches: plainMatches,
-            count: plainMatches.length
-        });
+        // 直接返回数组给前端
+        res.status(200).json(plainMatches);
     }
     catch (error) {
         console.error('Error in getMatches:', error);
