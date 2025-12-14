@@ -10,10 +10,17 @@ export const getFavorites = async (req: any, res: Response) => {
     // 获取模型
     const User = (global as any).User;
     const Favorite = (global as any).Favorite;
-    const currentUserId = req.user.id;
     
     console.log('User model found:', !!User);
     console.log('Favorite model found:', !!Favorite);
+    
+    // 检查用户是否已认证
+    if (!req.user || !req.user.id) {
+      console.error('User not authenticated or missing id');
+      return res.status(200).json([]);
+    }
+    
+    const currentUserId = req.user.id;
     
     // 检查Favorite模型是否存在
     if (!Favorite) {
@@ -63,9 +70,16 @@ export const getFavorites = async (req: any, res: Response) => {
 // @access  Private
 export const addFavorite = async (req: any, res: Response) => {
   try {
+    console.log('addFavorite called with user:', req.user?.id);
     // 获取模型
     const User = (global as any).User;
     let Favorite = (global as any).Favorite;
+    
+    // 检查用户是否已认证
+    if (!req.user || !req.user.id) {
+      console.error('User not authenticated or missing id');
+      return res.status(401).json({ message: 'No token, authorization denied' });
+    }
     
     // 如果Favorite模型不存在，创建一个简单的实现
     if (!Favorite) {
@@ -140,8 +154,15 @@ export const addFavorite = async (req: any, res: Response) => {
 // @access  Private
 export const removeFavorite = async (req: any, res: Response) => {
   try {
+    console.log('removeFavorite called with user:', req.user?.id);
     // 获取模型
     const Favorite = (global as any).Favorite;
+    
+    // 检查用户是否已认证
+    if (!req.user || !req.user.id) {
+      console.error('User not authenticated or missing id');
+      return res.status(401).json({ message: 'No token, authorization denied' });
+    }
     
     // 检查Favorite模型是否存在
     if (!Favorite) {
