@@ -18,11 +18,7 @@ export const getFavorites = async (req: any, res: Response) => {
     // 检查Favorite模型是否存在
     if (!Favorite) {
       console.error('Favorite model not found');
-      return res.status(200).json({ 
-        success: true,
-        favorites: [],
-        count: 0
-      });
+      return res.status(200).json([]);
     }
     
     // 获取当前用户的所有收藏

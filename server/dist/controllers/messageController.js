@@ -132,10 +132,7 @@ const getConversation = async (req, res) => {
                 isRead: false
             }
         });
-        res.status(200).json({
-            message: 'Conversation retrieved successfully',
-            data: messages
-        });
+        res.status(200).json(messages);
     }
     catch (error) {
         console.error('Error in getConversation:', error);

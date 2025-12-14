@@ -27,7 +27,8 @@ const Matches = () => {
             Authorization: `Bearer ${token}`
           }
         })
-        setUsers(response.data)
+        // 确保数据是数组格式
+        setUsers(Array.isArray(response.data) ? response.data : [])
       } catch (err: any) {
         setError(err.response?.data?.message || '获取推荐用户失败')
       } finally {

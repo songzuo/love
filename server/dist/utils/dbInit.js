@@ -7,11 +7,25 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const initializeDatabase = async () => {
     try {
         console.log('Initializing database...');
-        // 获取User模型
+        // 获取所有需要的模型
         const User = global.User;
-        if (!User) {
-            console.log('User model not available yet');
+        const Favorite = global.Favorite;
+        if (!User || !Favorite) {
+            console.log('Required models not available yet');
             return;
+        }
+        // 确保所有表都已创建
+        const sequelize = global.sequelize;
+        if (sequelize) {
+            console.log('Syncing database models...');
+            try {
+                // 使用sync({ force: false })确保表存在但不会删除现有数据
+                await sequelize.sync({ force: false });
+                console.log('Database models synced successfully');
+            }
+            catch (syncError) {
+                console.error('Error syncing database models:', syncError);
+            }
         }
         // 检查当前表结构
         try {
@@ -21,6 +35,10 @@ const initializeDatabase = async () => {
             if (tables.includes('users')) {
                 const tableDesc = await queryInterface.describeTable('users');
                 console.log('Current users table structure:', tableDesc);
+            }
+            if (tables.includes('favorites')) {
+                const tableDesc = await queryInterface.describeTable('favorites');
+                console.log('Current favorites table structure:', tableDesc);
             }
         }
         catch (tableError) {

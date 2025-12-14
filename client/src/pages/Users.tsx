@@ -31,7 +31,8 @@ const Users = () => {
             Authorization: `Bearer ${token}`
           }
         })
-        setUsers(response.data)
+        // 确保数据是数组格式
+        setUsers(Array.isArray(response.data) ? response.data : [])
       } catch (err: any) {
         setError(err.response?.data?.message || '获取用户列表失败')
       } finally {

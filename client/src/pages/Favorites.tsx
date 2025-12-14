@@ -26,7 +26,11 @@ const Favorites = () => {
       const response = await axios.get('/api/favorites', {
         headers: { Authorization: `Bearer ${token}` }
       })
-      setFavorites(response.data)
+      // 处理后端返回的数据结构，提取favoritedUser对象
+      const userData = Array.isArray(response.data) ? 
+        response.data.map(item => item.favoritedUser || {}).filter(user => user.id) : 
+        []
+      setFavorites(userData)
     } catch (err: any) {
       setError(err.response?.data?.message || '获取收藏列表失败')
     } finally {
@@ -43,6 +47,7 @@ const Favorites = () => {
       await axios.delete(`/api/favorites/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
+      // 从本地状态中移除已取消收藏的用户
       setFavorites(favorites.filter(user => user.id !== userId))
       alert('已取消收藏')
     } catch (err: any) {
