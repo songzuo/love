@@ -15,24 +15,49 @@ const initializeDatabase = async () => {
     // 确保所有表都已创建
     const sequelize = (global as any).sequelize;
     if (sequelize) {
-      console.log('Syncing database models with alter: true...');
+      console.log('Syncing database models...');
       try {
-        // 使用sync({ alter: true })确保缺失的表被创建，现有表结构被更新
+        // 首先尝试显式创建Favorite表，确保它存在
+        console.log('Explicitly syncing Favorite model...');
+        await Favorite.sync({ 
+          alter: true, // 创建缺失的表并更新现有表结构
+          force: false // 不删除现有数据
+        });
+        console.log('Favorite table synced successfully');
+        
+        // 然后同步所有模型
+        console.log('Syncing all models with alter: true...');
         await sequelize.sync({ 
           alter: true, // 创建缺失的表并更新现有表结构
           force: false // 不删除现有数据
         });
-        console.log('Database models synced successfully with alter: true');
+        console.log('All database models synced successfully');
       } catch (syncError) {
         console.error('Error syncing database models:', syncError);
-        // 如果alter失败，尝试更激进的方式确保表存在
-        console.log('Attempting to create missing tables explicitly...');
+        // 如果普通sync失败，尝试更激进的方式确保表存在
+        console.log('Attempting to create Favorite table with force: false...');
         try {
-          // 显式初始化Favorite模型表
+          // 显式初始化Favorite模型表，使用force: false确保数据安全
           await Favorite.sync({ force: false });
-          console.log('Favorite table created/updated successfully');
+          console.log('Favorite table created successfully');
         } catch (createError) {
           console.error('Error creating Favorite table:', createError);
+          // 作为最后的手段，尝试使用原始SQL创建表
+          console.log('Attempting to create Favorite table using raw SQL...');
+          try {
+            await sequelize.query(`
+              CREATE TABLE IF NOT EXISTS "favorites" (
+                "id" SERIAL PRIMARY KEY,
+                "userId" INTEGER NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
+                "favoritedUserId" INTEGER NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
+                "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                "updatedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+              );
+            `);
+            console.log('Favorite table created successfully using raw SQL');
+          } catch (sqlError) {
+            console.error('Error creating Favorite table with raw SQL:', sqlError);
+          }
         }
       }
     }
