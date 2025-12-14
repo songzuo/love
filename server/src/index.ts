@@ -34,7 +34,8 @@ connectDB()
     // Initialize models and relationships AFTER database connection
     const { User, Message, Favorite } = createModels(sequelize) as { User: any, Message: any, Favorite: any }
     
-    // Make models globally available
+    // Make models and sequelize globally available
+    (global as any).sequelize = sequelize;
     (global as any).User = User;
     (global as any).Message = Message;
     (global as any).Favorite = Favorite;
