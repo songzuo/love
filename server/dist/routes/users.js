@@ -7,6 +7,10 @@ const express_1 = __importDefault(require("express"));
 const auth_1 = require("../middleware/auth");
 const userController_1 = require("../controllers/userController");
 const router = express_1.default.Router();
+// @route   GET /api/users
+// @desc    Get all users for browsing
+// @access  Private
+router.get('/', auth_1.auth, userController_1.getUsers);
 // @route   GET /api/users/profile
 // @desc    Get current user profile
 // @access  Private

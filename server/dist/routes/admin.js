@@ -30,5 +30,13 @@ router.put('/users/:id/demote', adminController_1.demoteToUser);
 // @desc    Delete user
 // @access  Private/Admin
 router.delete('/users/:id', userController_1.deleteUser);
+// @route   GET /api/admin/statistics
+// @desc    Get basic admin statistics
+// @access  Private/Admin
+router.get('/statistics', adminController_1.getStatistics);
+// @route   GET /api/admin/statistics/detailed
+// @desc    Get detailed admin statistics
+// @access  Private/Admin
+router.get('/statistics/detailed', adminController_1.getDetailedStatistics);
 exports.default = router;
 //# sourceMappingURL=admin.js.map

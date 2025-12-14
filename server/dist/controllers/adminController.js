@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.demoteToUser = exports.promoteToAdmin = exports.deleteUser = exports.updateUserStatus = exports.getAllUsers = void 0;
+exports.getDetailedStatistics = exports.getStatistics = exports.demoteToUser = exports.promoteToAdmin = exports.deleteUser = exports.updateUserStatus = exports.getAllUsers = void 0;
+const sequelize_1 = require("sequelize");
 // @desc    Get all users (admin only)
 // @route   GET /api/admin/users
 // @access  Private/Admin
@@ -142,4 +143,99 @@ const demoteToUser = async (req, res) => {
     }
 };
 exports.demoteToUser = demoteToUser;
+// @desc    Get basic admin statistics
+// @route   GET /api/admin/statistics
+// @access  Private/Admin
+const getStatistics = async (req, res) => {
+    try {
+        // 获取User模型
+        const User = global.User;
+        // 计算日期范围
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const weekAgo = new Date(today);
+        weekAgo.setDate(today.getDate() - 7);
+        // 查询各种统计数据
+        const totalUsers = await User.count();
+        const activeUsers = await User.count({ where: { status: 'active' } });
+        const inactiveUsers = await User.count({ where: { status: 'inactive' } });
+        const adminUsers = await User.count({ where: { role: 'admin' } });
+        const newUsersToday = await User.count({ where: { createdAt: { [sequelize_1.Op.gte]: today } } });
+        const newUsersThisWeek = await User.count({ where: { createdAt: { [sequelize_1.Op.gte]: weekAgo } } });
+        res.status(200).json({
+            totalUsers,
+            activeUsers,
+            inactiveUsers,
+            adminUsers,
+            newUsersToday,
+            newUsersThisWeek
+        });
+    }
+    catch (error) {
+        console.error('Error in getStatistics:', error);
+        res.status(500).json({ message: '获取统计数据失败' });
+    }
+};
+exports.getStatistics = getStatistics;
+// @desc    Get detailed admin statistics
+// @route   GET /api/admin/statistics/detailed
+// @access  Private/Admin
+const getDetailedStatistics = async (req, res) => {
+    try {
+        // 获取User模型
+        const User = global.User;
+        // 计算日期范围
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const weekAgo = new Date(today);
+        weekAgo.setDate(today.getDate() - 7);
+        const monthAgo = new Date(today);
+        monthAgo.setMonth(today.getMonth() - 1);
+        // 查询基本统计数据
+        const totalUsers = await User.count();
+        const activeUsers = await User.count({ where: { status: 'active' } });
+        const inactiveUsers = await User.count({ where: { status: 'inactive' } });
+        const adminUsers = await User.count({ where: { role: 'admin' } });
+        const regularUsers = await User.count({ where: { role: 'user' } });
+        const newUsersToday = await User.count({ where: { createdAt: { [sequelize_1.Op.gte]: today } } });
+        const newUsersThisWeek = await User.count({ where: { createdAt: { [sequelize_1.Op.gte]: weekAgo } } });
+        const newUsersThisMonth = await User.count({ where: { createdAt: { [sequelize_1.Op.gte]: monthAgo } } });
+        // 查询用户增长趋势数据（过去7天）
+        const userGrowth = [];
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(today.getDate() - i);
+            const nextDate = new Date(date);
+            nextDate.setDate(date.getDate() + 1);
+            const count = await User.count({
+                where: {
+                    createdAt: {
+                        [sequelize_1.Op.gte]: date,
+                        [sequelize_1.Op.lt]: nextDate
+                    }
+                }
+            });
+            userGrowth.push({
+                date: date.toISOString().split('T')[0],
+                count
+            });
+        }
+        res.status(200).json({
+            totalUsers,
+            activeUsers,
+            inactiveUsers,
+            adminUsers,
+            regularUsers,
+            newUsersToday,
+            newUsersThisWeek,
+            newUsersThisMonth,
+            userGrowth
+        });
+    }
+    catch (error) {
+        console.error('Error in getDetailedStatistics:', error);
+        res.status(500).json({ message: '获取统计数据失败' });
+    }
+};
+exports.getDetailedStatistics = getDetailedStatistics;
 //# sourceMappingURL=adminController.js.map

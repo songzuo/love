@@ -47,6 +47,8 @@ const users_1 = __importDefault(require("./routes/users"));
 const admin_1 = __importDefault(require("./routes/admin"));
 const messages_1 = __importDefault(require("./routes/messages"));
 const publicAdmin_1 = __importDefault(require("./routes/publicAdmin"));
+const matches_1 = __importDefault(require("./routes/matches"));
+const favorites_1 = __importDefault(require("./routes/favorites"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const dbInit_1 = __importDefault(require("./utils/dbInit"));
@@ -64,10 +66,11 @@ console.log('Connecting to database...');
     .then(async () => {
     console.log('Database connected successfully');
     // Initialize models and relationships AFTER database connection
-    const { User, Message } = (0, models_1.createModels)(db_1.sequelize);
+    const { User, Message, Favorite } = (0, models_1.createModels)(db_1.sequelize);
     // Make models globally available
     global.User = User;
     global.Message = Message;
+    global.Favorite = Favorite;
     // Initialize database with admin users AFTER models are created
     await (0, dbInit_1.default)();
     // Now that database is ready, set up the rest of the app
@@ -88,6 +91,8 @@ const setupApp = () => {
     app.use('/api/admin', admin_1.default);
     app.use('/api/messages', messages_1.default);
     app.use('/api/public-admin', publicAdmin_1.default);
+    app.use('/api/matches', matches_1.default);
+    app.use('/api/favorites', favorites_1.default);
     // Health check route
     app.get('/api/health', (req, res) => {
         res.status(200).json({ status: 'ok', message: 'Dating App API is running' });

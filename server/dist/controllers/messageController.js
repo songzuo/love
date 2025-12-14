@@ -11,7 +11,7 @@ const sendMessage = async (req, res) => {
         const User = global.User;
         const Message = global.Message;
         const { recipientId, content } = req.body;
-        const senderId = req.user._id;
+        const senderId = req.user.id;
         // Check if recipient exists
         const recipient = await User.findByPk(recipientId);
         if (!recipient) {
@@ -51,10 +51,20 @@ exports.sendMessage = sendMessage;
 // @access  Private
 const getMessages = async (req, res) => {
     try {
+        console.log('getMessages called with user:', req.user?.id);
         // 获取模型
         const User = global.User;
         const Message = global.Message;
-        const userId = req.user._id;
+        if (!User || !Message) {
+            console.error('Models not found:', { User: !!User, Message: !!Message });
+            return res.status(500).json({
+                success: false,
+                message: '获取消息失败',
+                error: 'Models not initialized'
+            });
+        }
+        const userId = req.user.id;
+        console.log('Fetching messages for user:', userId);
         // Get all messages where user is sender or recipient
         const messages = await Message.findAll({
             where: {
@@ -69,14 +79,22 @@ const getMessages = async (req, res) => {
             ],
             order: [['createdAt', 'DESC']]
         });
+        console.log('Messages found:', messages.length);
+        // 确保返回纯JavaScript对象
+        const plainMessages = messages.map((message) => message.toJSON ? message.toJSON() : message);
         res.status(200).json({
+            success: true,
             message: 'Messages retrieved successfully',
-            data: messages
+            data: plainMessages
         });
     }
     catch (error) {
         console.error('Error in getMessages:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({
+            success: false,
+            message: '获取消息失败',
+            error: error instanceof Error ? error.message : 'Unknown error'
+        });
     }
 };
 exports.getMessages = getMessages;
@@ -88,7 +106,7 @@ const getConversation = async (req, res) => {
         // 获取模型
         const User = global.User;
         const Message = global.Message;
-        const currentUserId = req.user._id;
+        const currentUserId = req.user.id;
         const otherUserId = Number(req.params.userId);
         // Check if other user exists
         const otherUser = await User.findByPk(otherUserId);
@@ -137,7 +155,7 @@ const markAsRead = async (req, res) => {
         const User = global.User;
         const Message = global.Message;
         const messageId = Number(req.params.messageId);
-        const userId = req.user._id;
+        const userId = req.user.id;
         // Check if message exists and belongs to the user
         const message = await Message.findOne({
             where: {
@@ -171,7 +189,7 @@ const deleteMessage = async (req, res) => {
         const User = global.User;
         const Message = global.Message;
         const messageId = Number(req.params.messageId);
-        const userId = req.user._id;
+        const userId = req.user.id;
         // Check if message exists and belongs to the user (sender or recipient)
         const message = await Message.findOne({
             where: {

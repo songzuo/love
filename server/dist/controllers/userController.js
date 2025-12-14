@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.updateUserStatus = exports.getAllUsers = exports.updateUserProfile = exports.getCurrentUser = void 0;
+exports.deleteUser = exports.updateUserStatus = exports.getAllUsers = exports.getUsers = exports.updateUserProfile = exports.getCurrentUser = void 0;
 const sequelize_1 = require("sequelize");
 // @desc    Get current user profile
 // @route   GET /api/users/profile
@@ -64,6 +64,33 @@ const updateUserProfile = async (req, res) => {
     }
 };
 exports.updateUserProfile = updateUserProfile;
+// @desc    Get all users for browsing
+// @route   GET /api/users
+// @access  Private
+const getUsers = async (req, res) => {
+    try {
+        // 获取User模型
+        const User = global.User;
+        const users = await User.findAll({ where: { id: { [sequelize_1.Op.ne]: req.user.id } } });
+        // 确保返回纯JavaScript对象而不是Sequelize实例
+        const plainUsers = users.map((user) => user.toJSON ? user.toJSON() : user);
+        // 返回明确的数据结构
+        res.status(200).json({
+            success: true,
+            users: plainUsers,
+            count: plainUsers.length
+        });
+    }
+    catch (error) {
+        console.error('Error in getUsers:', error);
+        res.status(500).json({
+            success: false,
+            message: '获取用户列表失败',
+            error: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+};
+exports.getUsers = getUsers;
 // @desc    Get all users (admin only)
 // @route   GET /api/admin/users
 // @access  Private/Admin
